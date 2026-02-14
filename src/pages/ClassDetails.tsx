@@ -233,10 +233,24 @@ const ClassDetails: React.FC = () => {
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Syllabus</h2>
                         <div className="space-y-4">
                             {classData.months.map((month, index) => (
-                                <div key={index} className="border border-gray-200 rounded-xl p-4 hover:border-teal-500 transition-colors cursor-pointer group">
+                                <div
+                                    key={index}
+                                    onClick={() => {
+                                        if (month.released || isOwner) {
+                                            navigate(`/dashboard/classes/${id}/months/${month.yearMonth}`);
+                                        }
+                                    }}
+                                    className={`border border-gray-200 rounded-xl p-4 transition-colors group ${(month.released || isOwner)
+                                        ? 'cursor-pointer hover:border-teal-500'
+                                        : 'cursor-not-allowed opacity-75 bg-gray-50'
+                                        }`}
+                                >
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
+                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold transition-colors ${(month.released || isOwner)
+                                                ? 'bg-gray-100 text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600'
+                                                : 'bg-gray-100 text-gray-400'
+                                                }`}>
                                                 {index + 1}
                                             </div>
                                             <div>

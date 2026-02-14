@@ -1,0 +1,49 @@
+API Documentation
+Base URL
+http://localhost:9090/api
+
+Authentication
+Most endpoints require a valid JWT token in the token cookie or Authorization header.
+
+Teacher/Admin: Required for creating/updating content.
+Student: Read-only access to enrolled content (where applicable).
+1. Classes API
+Base URL: /classes
+
+Class Management
+Method	Endpoint	Description	Roles
+POST	/	Create a new class	Teacher, Admin
+GET	/	Get all classes	Teacher, Admin, Student
+GET	/{id}	Get class by ID	Teacher, Admin, Student
+GET	/instructor/{username}	Get classes by instructor username	Teacher, Admin, Student
+PUT	/{id}	Update class details	Teacher, Admin
+DELETE	/{id}	Delete a class	Admin
+PATCH	/{id}/status	Update class status (DRAFT, PUBLISHED, etc.)	Admin
+PATCH	/{id}/extend	Extend class duration by months	Admin
+Content Management (Videos & Documents)
+Method	Endpoint	Description	Roles
+POST	/{classId}/months/{yearMonth}/videos/{videoId}	Add video to a specific month	Teacher, Admin
+DELETE	/{classId}/months/{yearMonth}/videos/{videoId}	Remove video from a month	Teacher, Admin
+GET	/{classId}/months/{yearMonth}/videos	Get all video IDs for a month	Teacher, Admin, Student
+POST	/{classId}/months/{yearMonth}/documents/{documentId}	Add document to a specific month	Teacher, Admin
+DELETE	/{classId}/months/{yearMonth}/documents/{documentId}	Remove document from a month	Teacher, Admin
+GET	/{classId}/months/{yearMonth}/documents	Get all document IDs for a month	Teacher, Admin, Student
+Release Management
+Method	Endpoint	Description	Roles
+POST	/{classId}/months/{yearMonth}/release	Release a month's content	Teacher, Admin
+POST	/{classId}/months/{yearMonth}/unrelease	Un-release (hide) a month's content	Teacher, Admin
+2. Videos API
+Base URL: /videos
+
+Method	Endpoint	Description	Roles
+POST	/upload	Upload a video file	Teacher, Admin
+POST	/test	Create a test video record (no file)	Any (Public/Test)
+GET	/	Get all videos	Any
+GET	/{id}	Get video by ID	Any
+DELETE	/{id}	Delete a video	Any
+Video Upload Parameters (POST /upload)
+file
+: The video file (MultipartFile)
+name
+: Display name of the video
+description: Description of the video

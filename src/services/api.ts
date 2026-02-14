@@ -58,3 +58,8 @@ export const extendClassDuration = async (id: string, additionalMonths: number) 
 export const deleteClass = async (id: string) => {
   await classApi.delete(`/${id}`);
 };
+
+export const getClassMonthVideos = async (classId: string, monthId: string) => {
+  const response = await classApi.get(`/${classId}/months/${monthId}/videos`);
+  return response.data;
+};
