@@ -186,3 +186,14 @@ export const deleteQuestionFromQuiz = async (quizId: string, questionId: string)
   const response = await quizApi.delete(`/${quizId}/delete-question/${questionId}`);
   return response.data;
 };
+
+// Quiz Results API
+export const getQuizResults = async (quizId: string) => {
+  const response = await quizApi.get(`/quiz/${quizId}/results`);
+  return response.data;
+};
+
+export const getQuizStatistics = async (quizId: string) => {
+  const response = await quizApi.get(`/quiz/${quizId}/statistics`);
+  return response.data;
+};
