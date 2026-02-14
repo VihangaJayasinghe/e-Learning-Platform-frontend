@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     LayoutDashboard,
     BookOpen,
@@ -24,7 +24,25 @@ interface SidebarItem {
 const Sidebar: React.FC = () => {
     const context = useContext(AuthContext);
     const navigate = useNavigate();
-    const [activeLabel, setActiveLabel] = useState<string>("Dashboard");
+    const location = useLocation();
+
+    // Determine active label based on current path
+    const getActiveLabel = () => {
+        const path = location.pathname;
+        if (path === "/dashboard") return "Dashboard";
+        if (path.includes("/classes")) return "Classes";
+        if (path.includes("/videos")) return "Videos";
+        if (path.includes("/earnings")) return "Earnings";
+        if (path.includes("/browse")) return "Browse";
+        if (path.includes("/payments")) return "Payments";
+        if (path.includes("/users")) return "Users";
+        if (path.includes("/finance")) return "Finance";
+        if (path.includes("/settings")) return "Settings";
+        if (path.includes("/profile")) return "Profile";
+        return "Dashboard";
+    };
+
+    const activeLabel = getActiveLabel();
 
     if (!context) {
         return null;
@@ -34,11 +52,9 @@ const Sidebar: React.FC = () => {
     const role = user?.role.toUpperCase();
 
     const handleNavigation = (label: string, path?: string) => {
-        setActiveLabel(label);
         if (path) {
             navigate(path);
         }
-        // For demo purposes, we just update the active label visually
     };
 
     const getRoleItems = (): SidebarItem[] => {
@@ -46,21 +62,21 @@ const Sidebar: React.FC = () => {
             case "TEACHER":
                 return [
                     { icon: LayoutDashboard, label: "Dashboard", action: () => handleNavigation("Dashboard", "/dashboard") },
-                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes") },
-                    { icon: Video, label: "Videos", action: () => handleNavigation("Videos") },
-                    { icon: DollarSign, label: "Earnings", action: () => handleNavigation("Earnings") },
+                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes", "/dashboard/classes") },
+                    { icon: Video, label: "Videos", action: () => handleNavigation("Videos", "/dashboard/videos") },
+                    { icon: DollarSign, label: "Earnings", action: () => handleNavigation("Earnings", "/dashboard/earnings") },
                 ];
             case "STUDENT":
                 return [
-                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes") },
-                    { icon: Search, label: "Browse", action: () => handleNavigation("Browse") },
-                    { icon: CreditCard, label: "Payments", action: () => handleNavigation("Payments") },
+                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes", "/dashboard/classes") },
+                    { icon: Search, label: "Browse", action: () => handleNavigation("Browse", "/dashboard/browse") },
+                    { icon: CreditCard, label: "Payments", action: () => handleNavigation("Payments", "/dashboard/payments") },
                 ];
             case "ADMIN":
                 return [
-                    { icon: Users, label: "Users", action: () => handleNavigation("Users") },
-                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes") },
-                    { icon: DollarSign, label: "Finance", action: () => handleNavigation("Finance") },
+                    { icon: Users, label: "Users", action: () => handleNavigation("Users", "/dashboard/users") },
+                    { icon: BookOpen, label: "Classes", action: () => handleNavigation("Classes", "/dashboard/classes") },
+                    { icon: DollarSign, label: "Finance", action: () => handleNavigation("Finance", "/dashboard/finance") },
                 ];
             default:
                 return [];
@@ -74,7 +90,7 @@ const Sidebar: React.FC = () => {
         { icon: UserIcon, label: "Profile", action: () => handleNavigation("Profile", "/profile") },
     ];
 
-    const SidebarIcon = ({ item, isBottom = false }: { item: SidebarItem; isBottom?: boolean }) => {
+    const SidebarIcon = ({ item }: { item: SidebarItem; isBottom?: boolean }) => {
         const isActive = activeLabel === item.label;
 
         return (
