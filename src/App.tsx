@@ -6,11 +6,14 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import DashboardIndex from "./pages/DashboardIndex";
+import Classes from "./pages/Classes";
 import GoogleCallback from "./pages/GoogleCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
+import ClassDetails from "./pages/ClassDetails";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -63,7 +66,11 @@ export default function App() {
                 <Dashboard />
               </PrivateRoute>
             }
-          />
+          >
+            <Route index element={<DashboardIndex />} />
+            <Route path="classes" element={<Classes />} />
+            <Route path="classes/:id" element={<ClassDetails />} />
+          </Route>
           <Route
             path="/profile"
             element={
