@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { AxiosError } from "axios";
 import {
   Lock,
   Loader2,
-  CheckCircle,
+  CheckCircle2,
   AlertCircle,
   ArrowLeft,
   ShieldCheck,
+  ShieldAlert,
+  Check,
 } from "lucide-react";
 
 const ResetPassword: React.FC = () => {
@@ -24,12 +26,43 @@ const ResetPassword: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Live Requirement State
+  const [requirements, setRequirements] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    special: false,
+  });
+
+  // Track password policy requirements live
+  useEffect(() => {
+    const pass = passwords.newPassword;
+    setRequirements({
+      length: pass.length >= 8,
+      uppercase: /[A-Z]/.test(pass),
+      number: /[0-9]/.test(pass),
+      special: /[@$!%*?&]/.test(pass),
+    });
+  }, [passwords.newPassword]);
+
+  // Live match check
+  const passwordsMatch =
+    passwords.newPassword.length > 0 &&
+    passwords.newPassword === passwords.confirmPassword;
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    if (passwords.newPassword !== passwords.confirmPassword) {
+    // Final security checks
+    const allMet = Object.values(requirements).every(Boolean);
+    if (!allMet) {
+      setError("Please meet all password requirements.");
+      return;
+    }
+
+    if (!passwordsMatch) {
       setError("Passwords do not match!");
       return;
     }
@@ -45,15 +78,32 @@ const ResetPassword: React.FC = () => {
       setMessage("Password reset successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      const axiosError = err as AxiosError<string>;
+      const axiosError = err as AxiosError<any>;
+      const backendMessage =
+        axiosError.response?.data?.message || axiosError.response?.data;
       setError(
-        axiosError.response?.data ||
-          "Invalid or expired token. Please request a new link.",
+        typeof backendMessage === "string"
+          ? backendMessage
+          : "Invalid or expired token. Please request a new link.",
       );
     } finally {
       setLoading(false);
     }
   };
+
+  // Reusable Requirement UI
+  const Requirement = ({ met, text }: { met: boolean; text: string }) => (
+    <div
+      className={`flex items-center gap-1.5 text-[10px] font-bold transition-colors ${met ? "text-green-600" : "text-gray-400"}`}
+    >
+      {met ? (
+        <Check size={12} strokeWidth={3} />
+      ) : (
+        <div className="w-3 h-3 border-2 border-gray-200 rounded-full" />
+      )}
+      {text}
+    </div>
+  );
 
   if (!token) {
     return (
@@ -79,12 +129,11 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center relative p-6 font-sans"
+      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center relative py-12 px-6 font-sans"
       style={{
         backgroundImage: `url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')`,
       }}
     >
-      {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/25"></div>
 
       <div className="relative z-10 w-full max-w-[450px] bg-white/70 backdrop-blur-xl rounded-[40px] shadow-2xl p-10 border border-white/40">
@@ -95,15 +144,14 @@ const ResetPassword: React.FC = () => {
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">
             Set New Password
           </h1>
-          <p className="text-gray-500 mt-1 font-medium">
+          <p className="text-gray-500 mt-1 font-medium text-sm">
             Please choose a strong password for your account.
           </p>
         </div>
 
-        {/* Status Messages */}
         {message && (
           <div className="mb-6 p-4 bg-green-50/80 border border-green-100 rounded-2xl flex items-center gap-3 text-green-700 font-bold text-xs animate-in fade-in zoom-in-95 duration-300">
-            <CheckCircle size={18} /> {message}
+            <CheckCircle2 size={18} /> {message}
           </div>
         )}
         {error && (
@@ -127,7 +175,7 @@ const ResetPassword: React.FC = () => {
                 placeholder="••••••••"
                 required
                 value={passwords.newPassword}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e) =>
                   setPasswords({ ...passwords, newPassword: e.target.value })
                 }
                 className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
@@ -135,7 +183,7 @@ const ResetPassword: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 relative">
             <label className="text-[10px] font-black uppercase text-gray-400 ml-2 tracking-widest">
               Confirm Password
             </label>
@@ -149,7 +197,7 @@ const ResetPassword: React.FC = () => {
                 placeholder="••••••••"
                 required
                 value={passwords.confirmPassword}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e) =>
                   setPasswords({
                     ...passwords,
                     confirmPassword: e.target.value,
@@ -157,7 +205,26 @@ const ResetPassword: React.FC = () => {
                 }
                 className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
               />
+              {passwords.confirmPassword && (
+                <div
+                  className={`absolute right-4 top-3.5 transition-colors ${passwordsMatch ? "text-green-500" : "text-red-400"}`}
+                >
+                  {passwordsMatch ? (
+                    <ShieldCheck size={18} />
+                  ) : (
+                    <ShieldAlert size={18} />
+                  )}
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Live Requirement Grid */}
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-white/30 p-3 rounded-2xl border border-white/40">
+            <Requirement met={requirements.length} text="8+ Characters" />
+            <Requirement met={requirements.uppercase} text="Uppercase Letter" />
+            <Requirement met={requirements.number} text="Includes Number" />
+            <Requirement met={requirements.special} text="Symbol (@$!%*?&)" />
           </div>
 
           <button
