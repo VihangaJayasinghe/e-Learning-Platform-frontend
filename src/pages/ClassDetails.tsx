@@ -233,7 +233,11 @@ const ClassDetails: React.FC = () => {
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Syllabus</h2>
                         <div className="space-y-4">
                             {classData.months.map((month, index) => (
-                                <div key={index} className="border border-gray-200 rounded-xl p-4 hover:border-teal-500 transition-colors cursor-pointer group">
+                                <div
+                                    key={index}
+                                    onClick={() => navigate(`/dashboard/classes/${id}/months/${month.yearMonth}`)}
+                                    className="border border-gray-200 rounded-xl p-4 hover:border-teal-500 transition-colors cursor-pointer group"
+                                >
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-4">
                                             <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">

@@ -58,3 +58,78 @@ export const extendClassDuration = async (id: string, additionalMonths: number) 
 export const deleteClass = async (id: string) => {
   await classApi.delete(`/${id}`);
 };
+
+export const addVideoToMonth = async (classId: string, yearMonth: string, videoId: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/videos/${videoId}`);
+  return response.data;
+};
+
+export const removeVideoFromMonth = async (classId: string, yearMonth: string, videoId: string) => {
+  const response = await classApi.delete(`/${classId}/months/${yearMonth}/videos/${videoId}`);
+  return response.data;
+};
+
+export const getMonthVideos = async (classId: string, yearMonth: string) => {
+  const response = await classApi.get(`/${classId}/months/${yearMonth}/videos`);
+  return response.data;
+};
+
+export const getMonthDocuments = async (classId: string, yearMonth: string) => {
+  const response = await classApi.get(`/${classId}/months/${yearMonth}/documents`);
+  return response.data;
+};
+
+// Video API
+export const videoApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/videos",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const getVideoById = async (id: string) => {
+  const response = await videoApi.get(`/${id}`);
+  return response.data;
+};
+
+export const uploadVideo = async (formData: FormData) => {
+  const response = await videoApi.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const deleteVideo = async (id: string) => {
+  await videoApi.delete(`/${id}`);
+};
+
+// Document API
+export const documentApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/documents", // Check controller path
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const getDocumentById = async (id: string) => {
+  const response = await documentApi.get(`/${id}`);
+  return response.data;
+};
+
+// Quiz API
+export const quizApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/quizzes",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const getQuizzesByClassAndMonth = async (classId: string, monthId: string) => {
+  const response = await quizApi.get(`/class/${classId}/month/${monthId}`);
+  return response.data;
+};
