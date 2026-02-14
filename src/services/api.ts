@@ -29,3 +29,8 @@ export const fetchClassesByInstructor = async (username: string) => {
   const response = await classApi.get(`/instructor/${username}`);
   return response.data;
 };
+
+export const createClass = async (classData: any) => {
+  const response = await classApi.post("", classData);
+  return response.data;
+};
