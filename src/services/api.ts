@@ -156,3 +156,33 @@ export const getQuizzesByClassAndMonth = async (classId: string, monthId: string
   const response = await quizApi.get(`/class/${classId}/month/${monthId}`);
   return response.data;
 };
+
+export const createQuiz = async (quizData: any) => {
+  const response = await quizApi.post("", quizData);
+  return response.data;
+};
+
+export const deleteQuiz = async (id: string) => {
+  await quizApi.delete(`/${id}`);
+};
+
+export const getQuizById = async (id: string) => {
+  const response = await quizApi.get(`/${id}`);
+  return response.data;
+};
+
+// Question API
+export const addQuestionToQuiz = async (quizId: string, questionData: any) => {
+  const response = await quizApi.post(`/${quizId}/add-question`, questionData);
+  return response.data;
+};
+
+export const updateQuestionInQuiz = async (quizId: string, questionId: string, questionData: any) => {
+  const response = await quizApi.put(`/${quizId}/update-question/${questionId}`, questionData);
+  return response.data;
+};
+
+export const deleteQuestionFromQuiz = async (quizId: string, questionId: string) => {
+  const response = await quizApi.delete(`/${quizId}/delete-question/${questionId}`);
+  return response.data;
+};

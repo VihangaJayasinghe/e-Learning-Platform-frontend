@@ -9,7 +9,8 @@ import {
     removeVideoFromMonth,
     deleteVideo,
     removeDocumentFromMonth,
-    deleteDocument
+    deleteDocument,
+    deleteQuiz
 } from "../services/api";
 import {
     ArrowLeft,
@@ -26,6 +27,8 @@ import VideoFormModal from "../components/modals/VideoFormModal";
 import DeleteVideoModal from "../components/modals/DeleteVideoModal";
 import DocumentFormModal from "../components/modals/DocumentFormModal";
 import DeleteDocumentModal from "../components/modals/DeleteDocumentModal";
+import QuizFormModal from "../components/modals/QuizFormModal";
+import DeleteQuizModal from "../components/modals/DeleteQuizModal";
 
 interface VideoData {
     id: string;
@@ -65,6 +68,10 @@ const MonthDetails: React.FC = () => {
     const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
     const [isDeleteDocumentModalOpen, setIsDeleteDocumentModalOpen] = useState(false);
     const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+
+    const [isAddQuizModalOpen, setIsAddQuizModalOpen] = useState(false);
+    const [isDeleteQuizModalOpen, setIsDeleteQuizModalOpen] = useState(false);
+    const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
 
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -161,6 +168,28 @@ const MonthDetails: React.FC = () => {
     const handleDeleteDocumentClick = (documentId: string) => {
         setDocumentToDelete(documentId);
         setIsDeleteDocumentModalOpen(true);
+    };
+
+    const confirmDeleteQuiz = async () => {
+        if (!quizToDelete) return;
+
+        try {
+            setActionLoading(true);
+            await deleteQuiz(quizToDelete);
+            fetchData();
+            setIsDeleteQuizModalOpen(false);
+            setQuizToDelete(null);
+        } catch (err: any) {
+            console.error("Failed to delete quiz", err);
+            alert("Failed to delete quiz.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDeleteQuizClick = (quizId: string) => {
+        setQuizToDelete(quizId);
+        setIsDeleteQuizModalOpen(true);
     };
 
     if (loading) {
@@ -319,14 +348,22 @@ const MonthDetails: React.FC = () => {
 
                     {/* Quizzes Section */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
-                                <HelpCircle size={24} />
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
+                                    <HelpCircle size={24} />
+                                </div>
+                                <h2 className="text-xl font-bold text-gray-900">Quizzes</h2>
+                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
+                                    {quizzes.length}
+                                </span>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">Quizzes</h2>
-                            <span className="ml-auto bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                                {quizzes.length}
-                            </span>
+                            <button
+                                onClick={() => setIsAddQuizModalOpen(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-bold"
+                            >
+                                <Plus size={16} /> Add
+                            </button>
                         </div>
 
                         {quizzes.length === 0 ? (
@@ -334,20 +371,29 @@ const MonthDetails: React.FC = () => {
                         ) : (
                             <div className="space-y-4">
                                 {quizzes.map((quiz) => (
-                                    <div key={quiz.id} className="group border border-gray-100 rounded-xl p-4 hover:border-purple-200 hover:shadow-sm transition-all">
-                                        <div className="flex justify-between items-start mb-2">
+                                    <div key={quiz.id} className="group flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:border-purple-200 hover:shadow-sm transition-all relative">
+                                        <div className="flex-1 pr-12">
                                             <h3 className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-1">
                                                 {quiz.title}
                                             </h3>
-                                            <HelpCircle size={20} className="text-gray-300 group-hover:text-purple-500" />
+                                            <p className="text-sm text-gray-500 line-clamp-1">{quiz.description}</p>
                                         </div>
-                                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{quiz.description}</p>
-                                        <button
-                                            className="text-xs font-bold text-purple-600 hover:underline"
-                                            onClick={() => {/* Navigate to quiz attempt or details */ }}
-                                        >
-                                            View Quiz
-                                        </button>
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                className="text-xs font-bold text-purple-600 hover:underline"
+                                                onClick={() => navigate(`/dashboard/quiz/${quiz.id}`)}
+                                            >
+                                                View
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteQuizClick(quiz.id)}
+                                                className="text-gray-300 hover:text-red-600 transition-colors"
+                                                title="Remove Quiz"
+                                                disabled={actionLoading}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -390,6 +436,24 @@ const MonthDetails: React.FC = () => {
                     setDocumentToDelete(null);
                 }}
                 onConfirm={confirmDeleteDocument}
+                loading={actionLoading}
+            />
+
+            <QuizFormModal
+                isOpen={isAddQuizModalOpen}
+                onClose={() => setIsAddQuizModalOpen(false)}
+                onSuccess={fetchData}
+                classId={classId!}
+                yearMonth={yearMonth!}
+            />
+
+            <DeleteQuizModal
+                isOpen={isDeleteQuizModalOpen}
+                onClose={() => {
+                    setIsDeleteQuizModalOpen(false);
+                    setQuizToDelete(null);
+                }}
+                onConfirm={confirmDeleteQuiz}
                 loading={actionLoading}
             />
         </div>

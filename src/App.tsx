@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ClassDetails from "./pages/ClassDetails";
 import MonthDetails from "./pages/MonthDetails";
+import QuizEditor from "./pages/QuizEditor";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -72,6 +73,7 @@ export default function App() {
             <Route path="classes" element={<Classes />} />
             <Route path="classes/:id" element={<ClassDetails />} />
             <Route path="classes/:classId/months/:yearMonth" element={<MonthDetails />} />
+            <Route path="quiz/:quizId" element={<QuizEditor />} />
           </Route>
           <Route
             path="/profile"
