@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClassById } from "../services/api";
-import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import { getClassById, extendClassDuration, updateClassStatus, deleteClass } from "../services/api";
+import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import ClassFormModal from "../components/modals/CreateClassModal";
 
 interface ClassDetailsData {
     id: string;
@@ -30,25 +32,80 @@ interface ClassDetailsData {
 const ClassDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext)!; // Assume context exists
     const [classData, setClassData] = useState<ClassDetailsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [extendMonths, setExtendMonths] = useState(1);
+    const [deleteConfirmation, setDeleteConfirmation] = useState("");
+    const [actionLoading, setActionLoading] = useState(false);
+
+    const handleExtendDuration = async () => {
+        if (!classData || !id) return;
+        try {
+            setActionLoading(true);
+            await extendClassDuration(id, extendMonths);
+            await fetchClassDetails(); // Refresh data
+            setIsExtendModalOpen(false);
+            setExtendMonths(1); // Reset
+        } catch (err: any) {
+            console.error("Failed to extend duration", err);
+            alert(err.response?.data?.message || "Failed to extend duration");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleUpdateStatus = async () => {
+        if (!classData || !id) return;
+        const newStatus = classData.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+        if (!window.confirm(`Are you sure you want to change the status to ${newStatus}?`)) return;
+
+        try {
+            setActionLoading(true);
+            await updateClassStatus(id, newStatus);
+            await fetchClassDetails();
+        } catch (err: any) {
+            console.error("Failed to update status", err);
+            alert(err.response?.data?.message || "Failed to update status");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDeleteClass = async () => {
+        if (!classData || !id) return;
+        if (deleteConfirmation !== classData.className) return;
+
+        try {
+            setActionLoading(true);
+            await deleteClass(id);
+            navigate('/dashboard/classes');
+        } catch (err: any) {
+            console.error("Failed to delete class", err);
+            alert(err.response?.data?.message || "Failed to delete class");
+            setActionLoading(false);
+        }
+    };
+
+    const fetchClassDetails = async () => {
+        if (!id) return;
+        try {
+            setLoading(true);
+            const data = await getClassById(id);
+            setClassData(data);
+        } catch (err: any) {
+            console.error("Failed to fetch class details", err);
+            setError("Failed to load class details.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchClassDetails = async () => {
-            if (!id) return;
-            try {
-                setLoading(true);
-                const data = await getClassById(id);
-                setClassData(data);
-            } catch (err: any) {
-                console.error("Failed to fetch class details", err);
-                setError("Failed to load class details.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchClassDetails();
     }, [id]);
 
@@ -60,7 +117,7 @@ const ClassDetails: React.FC = () => {
         );
     }
 
-    if (error || !classData) {
+    if (error) { // Removed !classData from this condition as it's handled below
         return (
             <div className="flex flex-col items-center justify-center min-h-screen gap-4">
                 <div className="text-red-600 text-lg font-medium">{error || "Class not found"}</div>
@@ -74,14 +131,51 @@ const ClassDetails: React.FC = () => {
         );
     }
 
+    if (!classData) return null; // Handle case where classData is null after loading
+
+    const isOwner = user?.username === classData.teacher.username;
+
     return (
         <div className="min-h-screen bg-gray-50 p-8">
-            <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-gray-600 hover:text-teal-600 mb-6 transition-colors"
-            >
-                <ArrowLeft size={20} /> Back to Classes
-            </button>
+            <div className="flex justify-between items-center mb-6">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors"
+                >
+                    <ArrowLeft size={20} /> Back to Classes
+                </button>
+
+                {isOwner && (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleUpdateStatus}
+                            disabled={actionLoading}
+                            className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors shadow-sm ${classData.status === 'PUBLISHED' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                            {classData.status === 'PUBLISHED' ? <XCircle size={18} /> : <CheckCircle size={18} />}
+                            {classData.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+                        </button>
+                        <button
+                            onClick={() => setIsExtendModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                        >
+                            <Plus size={18} /> Extend
+                        </button>
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
+                        >
+                            <Edit size={18} /> Edit Class
+                        </button>
+                        <button
+                            onClick={() => setIsDeleteModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                        >
+                            <Trash2 size={18} /> Delete
+                        </button>
+                    </div>
+                )}
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Content */}
@@ -200,6 +294,103 @@ const ClassDetails: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <ClassFormModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={fetchClassDetails}
+                initialData={classData ? {
+                    className: classData.className,
+                    description: classData.description,
+                    monthlyPrice: classData.monthlyPrice,
+                    startMonth: classData.startMonth,
+                    durationMonths: classData.durationMonths
+                } : undefined}
+                classId={classData?.id}
+            />
+            {/* Extend Modal */}
+            {isExtendModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Extend Class Duration</h3>
+                        <p className="text-gray-500 mb-6">Add more months to the course content.</p>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Additional Months
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="12"
+                                value={extendMonths}
+                                onChange={(e) => setExtendMonths(parseInt(e.target.value) || 1)}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                            />
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setIsExtendModalOpen(false)}
+                                className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleExtendDuration}
+                                disabled={actionLoading}
+                                className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 flex items-center justify-center"
+                            >
+                                {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Extend"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Class</h3>
+                        <p className="text-gray-500 mb-4">
+                            Are you sure you want to delete this class? This action cannot be undone.
+                        </p>
+                        <p className="text-sm text-gray-600 mb-4">
+                            Type <span className="font-bold select-all">{classData?.className}</span> to confirm.
+                        </p>
+
+                        <div className="mb-6">
+                            <input
+                                type="text"
+                                value={deleteConfirmation}
+                                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                placeholder="Type class name"
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                            />
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setIsDeleteModalOpen(false);
+                                    setDeleteConfirmation("");
+                                }}
+                                className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteClass}
+                                disabled={actionLoading || deleteConfirmation !== classData?.className}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

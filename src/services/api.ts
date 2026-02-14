@@ -39,3 +39,22 @@ export const getClassById = async (id: string) => {
   const response = await classApi.get(`/${id}`);
   return response.data;
 };
+
+export const updateClass = async (id: string, classData: any) => {
+  const response = await classApi.put(`/${id}`, classData);
+  return response.data;
+};
+
+export const updateClassStatus = async (id: string, status: string) => {
+  const response = await classApi.patch(`/${id}/status?status=${status}`);
+  return response.data;
+};
+
+export const extendClassDuration = async (id: string, additionalMonths: number) => {
+  const response = await classApi.patch(`/${id}/extend?additionalMonths=${additionalMonths}`);
+  return response.data;
+};
+
+export const deleteClass = async (id: string) => {
+  await classApi.delete(`/${id}`);
+};

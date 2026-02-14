@@ -1,29 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Loader2, X } from "lucide-react";
-import { createClass } from "../../services/api";
+import { createClass, updateClass } from "../../services/api";
 
-interface CreateClassModalProps {
+interface ClassFormData {
+    className: string;
+    description: string;
+    monthlyPrice: number;
+    startMonth: string;
+    durationMonths: number;
+}
+
+interface ClassFormModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    initialData?: ClassFormData;
+    classId?: string; // If present, we are in Edit mode
 }
 
-const CreateClassModal: React.FC<CreateClassModalProps> = ({
+const ClassFormModal: React.FC<ClassFormModalProps> = ({
     isOpen,
     onClose,
     onSuccess,
+    initialData,
+    classId,
 }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<ClassFormData>({
         className: "",
         description: "",
         monthlyPrice: 0,
         startMonth: "",
-        durationMonths: 1, // Default to 1 month
+        durationMonths: 1,
     });
 
+    useEffect(() => {
+        if (isOpen && initialData) {
+            setFormData({
+                className: initialData.className || "",
+                description: initialData.description || "",
+                monthlyPrice: initialData.monthlyPrice || 0,
+                startMonth: initialData.startMonth || "",
+                durationMonths: initialData.durationMonths || 1,
+            });
+        } else if (isOpen && !initialData) {
+            // Reset form for create mode
+            setFormData({
+                className: "",
+                description: "",
+                monthlyPrice: 0,
+                startMonth: "",
+                durationMonths: 1,
+            });
+        }
+    }, [isOpen, initialData]);
+
     if (!isOpen) return null;
+
+    const isEditMode = !!classId;
 
     const handleChange = (
         e: React.ChangeEvent<
@@ -43,21 +78,17 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
         setError("");
 
         try {
-            await createClass(formData);
+            if (isEditMode && classId) {
+                await updateClass(classId, formData);
+            } else {
+                await createClass(formData);
+            }
             onSuccess();
             onClose();
-            // Reset form
-            setFormData({
-                className: "",
-                description: "",
-                monthlyPrice: 0,
-                startMonth: "",
-                durationMonths: 1,
-            });
         } catch (err: any) {
-            console.error("Failed to create class:", err);
+            console.error("Failed to save class:", err);
             setError(
-                err.response?.data?.message || "Failed to create class. Please try again."
+                err.response?.data?.message || "Failed to save class. Please try again."
             );
         } finally {
             setLoading(false);
@@ -68,7 +99,9 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-gray-900">Create New Class</h3>
+                    <h3 className="text-xl font-bold text-gray-900">
+                        {isEditMode ? "Edit Class" : "Create New Class"}
+                    </h3>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -124,7 +157,8 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
                                 value={formData.startMonth}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                                disabled={isEditMode}
+                                className={`w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all ${isEditMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                             />
                         </div>
                         <div>
@@ -138,7 +172,8 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
                                 onChange={handleChange}
                                 min="1"
                                 required
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                                disabled={isEditMode}
+                                className={`w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all ${isEditMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                             />
                         </div>
                     </div>
@@ -172,7 +207,7 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
                             disabled={loading}
                             className="flex-1 px-4 py-2 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center gap-2"
                         >
-                            {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Class"}
+                            {loading ? <Loader2 className="animate-spin" size={20} /> : (isEditMode ? "Update Class" : "Create Class")}
                         </button>
                     </div>
                 </form>
@@ -181,4 +216,4 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({
     );
 };
 
-export default CreateClassModal;
+export default ClassFormModal;

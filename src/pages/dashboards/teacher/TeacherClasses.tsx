@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { fetchClassesByInstructor } from "../../../services/api";
 import { Loader2, AlertCircle } from "lucide-react";
-import CreateClassModal from "../../../components/modals/CreateClassModal";
+import ClassFormModal from "../../../components/modals/CreateClassModal";
 import { useNavigate } from "react-router-dom";
 
 interface ClassItem {
@@ -23,6 +23,7 @@ const TeacherClasses: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedClass, setSelectedClass] = useState<ClassItem | undefined>(undefined);
 
     if (!context) return null;
     const { user } = context;
@@ -46,6 +47,16 @@ const TeacherClasses: React.FC = () => {
     useEffect(() => {
         loadClasses();
     }, [user?.username]);
+
+    const handleCreateClick = () => {
+        setSelectedClass(undefined);
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (cls: ClassItem) => {
+        setSelectedClass(cls);
+        setIsModalOpen(true);
+    };
 
     if (loading) {
         return (
@@ -72,7 +83,7 @@ const TeacherClasses: React.FC = () => {
                     <p className="text-gray-500 mt-1">Manage your courses and student enrollments</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleCreateClick}
                     className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-teal-100"
                 >
                     + Create New Class
@@ -83,7 +94,7 @@ const TeacherClasses: React.FC = () => {
                 <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
                     <p className="text-gray-500 text-lg">You haven't created any classes yet.</p>
                     <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={handleCreateClick}
                         className="mt-4 text-teal-600 font-bold hover:underline"
                     >
                         Create your first class
@@ -127,7 +138,10 @@ const TeacherClasses: React.FC = () => {
                             </div>
 
                             <div className="flex gap-2">
-                                <button className="flex-1 py-2 px-4 rounded-lg border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium transition-colors">
+                                <button
+                                    onClick={() => handleEditClick(cls)}
+                                    className="flex-1 py-2 px-4 rounded-lg border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium transition-colors"
+                                >
                                     Edit
                                 </button>
                                 <button
@@ -142,10 +156,18 @@ const TeacherClasses: React.FC = () => {
                 </div>
             )}
 
-            <CreateClassModal
+            <ClassFormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={loadClasses}
+                initialData={selectedClass ? {
+                    className: selectedClass.className,
+                    description: selectedClass.description,
+                    monthlyPrice: selectedClass.monthlyPrice,
+                    startMonth: selectedClass.startMonth,
+                    durationMonths: selectedClass.durationMonths
+                } : undefined}
+                classId={selectedClass ? selectedClass.id.toString() : undefined}
             />
         </div>
     );
