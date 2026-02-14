@@ -7,7 +7,9 @@ import {
     getVideoById,
     getDocumentById,
     removeVideoFromMonth,
-    deleteVideo
+    deleteVideo,
+    removeDocumentFromMonth,
+    deleteDocument
 } from "../services/api";
 import {
     ArrowLeft,
@@ -16,12 +18,14 @@ import {
     HelpCircle,
     Loader2,
     PlayCircle,
-    Download,
     Plus,
-    Trash2
+    Trash2,
+    Eye
 } from "lucide-react";
 import VideoFormModal from "../components/modals/VideoFormModal";
 import DeleteVideoModal from "../components/modals/DeleteVideoModal";
+import DocumentFormModal from "../components/modals/DocumentFormModal";
+import DeleteDocumentModal from "../components/modals/DeleteDocumentModal";
 
 interface VideoData {
     id: string;
@@ -33,9 +37,9 @@ interface VideoData {
 
 interface DocumentData {
     id: string;
-    name: string;
+    documentName: string;
     description: string;
-    firebaseUrl: string;
+    cloudinaryUrl: string;
     contentType: string;
 }
 
@@ -57,6 +61,11 @@ const MonthDetails: React.FC = () => {
     const [isAddVideoModalOpen, setIsAddVideoModalOpen] = useState(false);
     const [isDeleteVideoModalOpen, setIsDeleteVideoModalOpen] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
+
+    const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
+    const [isDeleteDocumentModalOpen, setIsDeleteDocumentModalOpen] = useState(false);
+    const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+
     const [actionLoading, setActionLoading] = useState(false);
 
     const fetchData = async () => {
@@ -123,6 +132,35 @@ const MonthDetails: React.FC = () => {
     const handleDeleteClick = (videoId: string) => {
         setVideoToDelete(videoId);
         setIsDeleteVideoModalOpen(true);
+    };
+
+    const confirmDeleteDocument = async (deleteFromStorage: boolean) => {
+        if (!classId || !yearMonth || !documentToDelete) return;
+
+        try {
+            setActionLoading(true);
+            // 1. Remove from month
+            await removeDocumentFromMonth(classId, yearMonth, documentToDelete);
+
+            // 2. Delete from storage (if requested)
+            if (deleteFromStorage) {
+                await deleteDocument(documentToDelete);
+            }
+
+            fetchData();
+            setIsDeleteDocumentModalOpen(false);
+            setDocumentToDelete(null);
+        } catch (err: any) {
+            console.error("Failed to delete document", err);
+            alert("Failed to delete document.");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDeleteDocumentClick = (documentId: string) => {
+        setDocumentToDelete(documentId);
+        setIsDeleteDocumentModalOpen(true);
     };
 
     if (loading) {
@@ -223,14 +261,22 @@ const MonthDetails: React.FC = () => {
 
                     {/* Documents Section */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                                <FileText size={24} />
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                    <FileText size={24} />
+                                </div>
+                                <h2 className="text-xl font-bold text-gray-900">Documents</h2>
+                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
+                                    {documents.length}
+                                </span>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">Documents</h2>
-                            <span className="ml-auto bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                                {documents.length}
-                            </span>
+                            <button
+                                onClick={() => setIsAddDocumentModalOpen(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold"
+                            >
+                                <Plus size={16} /> Add
+                            </button>
                         </div>
 
                         {documents.length === 0 ? (
@@ -238,22 +284,33 @@ const MonthDetails: React.FC = () => {
                         ) : (
                             <div className="space-y-4">
                                 {documents.map((doc) => (
-                                    <div key={doc.id} className="group border border-gray-100 rounded-xl p-4 hover:border-blue-200 hover:shadow-sm transition-all">
-                                        <div className="flex justify-between items-start mb-2">
+                                    <div key={doc.id} className="group flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all relative">
+                                        <div className="flex-1 pr-12">
                                             <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                                                {doc.name}
+                                                {doc.documentName}
                                             </h3>
-                                            <Download size={20} className="text-gray-300 group-hover:text-blue-500" />
+                                            <p className="text-sm text-gray-500 line-clamp-1">{doc.description}</p>
                                         </div>
-                                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{doc.description}</p>
-                                        <a
-                                            href={doc.firebaseUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs font-bold text-blue-600 hover:underline"
+                                        <div className="flex items-center gap-1">
+                                            <a
+                                                href={`https://docs.google.com/viewer?url=${encodeURIComponent(doc.cloudinaryUrl)}&embedded=false`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg transition-colors text-sm font-medium"
+                                                title="View Document"
+                                            >
+                                                <Eye size={16} />
+                                                View
+                                            </a>
+                                        </div>
+                                        <button
+                                            onClick={() => handleDeleteDocumentClick(doc.id)}
+                                            className="absolute top-4 right-12 mr-2 text-gray-300 hover:text-red-600 transition-colors"
+                                            title="Remove Document"
+                                            disabled={actionLoading}
                                         >
-                                            Download
-                                        </a>
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -315,6 +372,24 @@ const MonthDetails: React.FC = () => {
                     setVideoToDelete(null);
                 }}
                 onConfirm={confirmDeleteVideo}
+                loading={actionLoading}
+            />
+
+            <DocumentFormModal
+                isOpen={isAddDocumentModalOpen}
+                onClose={() => setIsAddDocumentModalOpen(false)}
+                onSuccess={fetchData}
+                classId={classId!}
+                yearMonth={yearMonth!}
+            />
+
+            <DeleteDocumentModal
+                isOpen={isDeleteDocumentModalOpen}
+                onClose={() => {
+                    setIsDeleteDocumentModalOpen(false);
+                    setDocumentToDelete(null);
+                }}
+                onConfirm={confirmDeleteDocument}
                 loading={actionLoading}
             />
         </div>

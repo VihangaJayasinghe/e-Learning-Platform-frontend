@@ -120,6 +120,29 @@ export const getDocumentById = async (id: string) => {
   return response.data;
 };
 
+export const uploadDocument = async (formData: FormData) => {
+  const response = await documentApi.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const deleteDocument = async (id: string) => {
+  await documentApi.delete(`/${id}`);
+};
+
+export const addDocumentToMonth = async (classId: string, yearMonth: string, documentId: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/documents/${documentId}`);
+  return response.data;
+};
+
+export const removeDocumentFromMonth = async (classId: string, yearMonth: string, documentId: string) => {
+  const response = await classApi.delete(`/${classId}/months/${yearMonth}/documents/${documentId}`);
+  return response.data;
+};
+
 // Quiz API
 export const quizApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/quizzes",
