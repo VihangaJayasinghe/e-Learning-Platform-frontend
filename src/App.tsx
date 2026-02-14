@@ -13,6 +13,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
+import ClassDetails from "./pages/ClassDetails";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -68,6 +69,7 @@ export default function App() {
           >
             <Route index element={<DashboardIndex />} />
             <Route path="classes" element={<Classes />} />
+            <Route path="classes/:id" element={<ClassDetails />} />
           </Route>
           <Route
             path="/profile"

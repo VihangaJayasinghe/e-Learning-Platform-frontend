@@ -34,3 +34,8 @@ export const createClass = async (classData: any) => {
   const response = await classApi.post("", classData);
   return response.data;
 };
+
+export const getClassById = async (id: string) => {
+  const response = await classApi.get(`/${id}`);
+  return response.data;
+};

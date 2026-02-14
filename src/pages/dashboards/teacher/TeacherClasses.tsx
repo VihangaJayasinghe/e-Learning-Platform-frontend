@@ -3,6 +3,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import { fetchClassesByInstructor } from "../../../services/api";
 import { Loader2, AlertCircle } from "lucide-react";
 import CreateClassModal from "../../../components/modals/CreateClassModal";
+import { useNavigate } from "react-router-dom";
 
 interface ClassItem {
     id: number;
@@ -17,6 +18,7 @@ interface ClassItem {
 
 const TeacherClasses: React.FC = () => {
     const context = useContext(AuthContext);
+    const navigate = useNavigate();
     const [classes, setClasses] = useState<ClassItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -128,7 +130,10 @@ const TeacherClasses: React.FC = () => {
                                 <button className="flex-1 py-2 px-4 rounded-lg border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium transition-colors">
                                     Edit
                                 </button>
-                                <button className="flex-1 py-2 px-4 rounded-lg bg-black text-white hover:bg-gray-800 font-medium transition-colors">
+                                <button
+                                    onClick={() => navigate(`/dashboard/classes/${cls.id}`)}
+                                    className="flex-1 py-2 px-4 rounded-lg bg-black text-white hover:bg-gray-800 font-medium transition-colors"
+                                >
                                     Manage
                                 </button>
                             </div>
