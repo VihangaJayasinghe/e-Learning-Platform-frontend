@@ -232,8 +232,8 @@ const QuizEditor: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('questions')}
                             className={`pb-3 px-2 font-bold text-sm transition-all ${activeTab === 'questions'
-                                    ? 'text-purple-600 border-b-2 border-purple-600'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-purple-600 border-b-2 border-purple-600'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             <span className="flex items-center gap-2"><Edit2 size={16} /> Questions</span>
@@ -241,8 +241,8 @@ const QuizEditor: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('results')}
                             className={`pb-3 px-2 font-bold text-sm transition-all ${activeTab === 'results'
-                                    ? 'text-purple-600 border-b-2 border-purple-600'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-purple-600 border-b-2 border-purple-600'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             <span className="flex items-center gap-2"><BarChart3 size={16} /> Results & Stats</span>
@@ -399,21 +399,21 @@ const QuizEditor: React.FC = () => {
                                             <BarChart3 size={20} />
                                             <span className="text-sm font-bold">Average Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-blue-600">{stats.averageScore.toFixed(1)}%</p>
+                                        <p className="text-3xl font-bold text-blue-600">{stats.averageScore ? stats.averageScore.toFixed(1) : 0}%</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-3 text-gray-500 mb-2">
                                             <Award size={20} />
                                             <span className="text-sm font-bold">Highest Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-green-600">{stats.highestScore}%</p>
+                                        <p className="text-3xl font-bold text-green-600">{stats.highestScore || 0}%</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-3 text-gray-500 mb-2">
                                             <Clock size={20} />
                                             <span className="text-sm font-bold">Lowest Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-red-500">{stats.lowestScore}%</p>
+                                        <p className="text-3xl font-bold text-red-500">{stats.lowestScore || 0}%</p>
                                     </div>
                                 </div>
 
@@ -422,18 +422,20 @@ const QuizEditor: React.FC = () => {
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-1">
                                         <h3 className="font-bold text-gray-900 mb-6">Score Distribution</h3>
                                         <div className="space-y-4">
-                                            {Object.entries(stats.scoreDistribution).map(([label, count]) => (
+                                            {stats.scoreDistribution ? Object.entries(stats.scoreDistribution).map(([label, count]) => (
                                                 <div key={label} className="flex items-center gap-4">
                                                     <span className="text-sm font-medium text-gray-600 w-24">{label}</span>
                                                     <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-purple-500 rounded-full"
-                                                            style={{ width: `${(count / stats.totalAttempts) * 100}%` }}
+                                                            style={{ width: `${stats.totalAttempts > 0 ? (count / stats.totalAttempts) * 100 : 0}%` }}
                                                         />
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900 w-8 text-right">{count}</span>
                                                 </div>
-                                            ))}
+                                            )) : (
+                                                <p className="text-gray-500 text-sm">No data available</p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -452,7 +454,7 @@ const QuizEditor: React.FC = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-50">
-                                                    {results.map((result) => (
+                                                    {results && results.length > 0 ? results.map((result) => (
                                                         <tr key={result.id} className="group hover:bg-gray-50/50">
                                                             <td className="py-4">
                                                                 <span className={`
@@ -471,7 +473,7 @@ const QuizEditor: React.FC = () => {
                                                                     ${result.scorePercentage >= 75 ? 'bg-green-100 text-green-700' :
                                                                         result.scorePercentage >= 50 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}
                                                                 `}>
-                                                                    {result.scorePercentage.toFixed(1)}%
+                                                                    {result.scorePercentage?.toFixed(1)}%
                                                                 </span>
                                                             </td>
                                                             <td className="py-4 text-sm text-gray-500">
@@ -481,7 +483,13 @@ const QuizEditor: React.FC = () => {
                                                                 {new Date(result.attemptDate).toLocaleDateString()}
                                                             </td>
                                                         </tr>
-                                                    ))}
+                                                    )) : (
+                                                        <tr>
+                                                            <td colSpan={5} className="py-8 text-center text-gray-500">
+                                                                No attempts yet.
+                                                            </td>
+                                                        </tr>
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>

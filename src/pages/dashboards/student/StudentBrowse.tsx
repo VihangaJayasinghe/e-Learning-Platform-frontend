@@ -28,8 +28,9 @@ const StudentBrowse: React.FC = () => {
         try {
             setLoading(true);
             const data = await getAllClasses();
-            // Filter only active classes if needed, or show all
-            setClasses(data);
+            // Filter only active classes
+            const activeClasses = Array.isArray(data) ? data.filter((c: any) => c.status === 'ACTIVE') : [];
+            setClasses(activeClasses);
         } catch (error) {
             console.error("Failed to fetch classes", error);
         } finally {

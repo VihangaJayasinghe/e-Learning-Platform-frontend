@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
-import { fetchClassesByInstructor } from "../../../services/api";
+import { fetchClassesByInstructor, updateClassStatus } from "../../../services/api";
 import { Loader2, AlertCircle } from "lucide-react";
 import ClassFormModal from "../../../components/modals/CreateClassModal";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +41,21 @@ const TeacherClasses: React.FC = () => {
             } finally {
                 setLoading(false);
             }
+        }
+    };
+
+    const handleStatusChange = async (classId: number, newStatus: string, e: React.ChangeEvent<HTMLSelectElement>) => {
+        e.stopPropagation(); // Prevent card click
+        try {
+            // Optimistic update
+            setClasses(classes.map(cls => cls.id === classId ? { ...cls, status: newStatus } : cls));
+            await updateClassStatus(classId.toString(), newStatus);
+            // Optional: Show success toast
+        } catch (error) {
+            console.error("Failed to update status", error);
+            // Revert on failure
+            loadClasses();
+            alert("Failed to update status");
         }
     };
 
@@ -105,11 +120,21 @@ const TeacherClasses: React.FC = () => {
                     {classes.map((cls) => (
                         <div key={cls.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:shadow-gray-100 transition-all duration-300 group">
                             <div className="flex justify-between items-start mb-4">
-                                <div className={`px-2 py-1 text-xs font-bold rounded uppercase tracking-wider ${cls.status === 'PUBLISHED'
-                                    ? "bg-teal-100 text-teal-700"
-                                    : "bg-gray-100 text-gray-600"
-                                    }`}>
-                                    {cls.status || 'DRAFT'}
+                                <div className="z-10" onClick={(e) => e.stopPropagation()}>
+                                    <select
+                                        value={cls.status || 'DRAFT'}
+                                        onChange={(e) => handleStatusChange(cls.id, e.target.value, e)}
+                                        className={`px-2 py-1 text-xs font-bold rounded uppercase tracking-wider border-none focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer ${cls.status === 'ACTIVE' ? "bg-teal-100 text-teal-700" :
+                                            cls.status === 'INACTIVE' ? "bg-yellow-100 text-yellow-700" :
+                                                cls.status === 'ARCHIVED' ? "bg-gray-200 text-gray-700" :
+                                                    "bg-gray-100 text-gray-600"
+                                            }`}
+                                    >
+                                        <option value="DRAFT">Draft</option>
+                                        <option value="ACTIVE">Active</option>
+                                        <option value="INACTIVE">Inactive</option>
+                                        <option value="ARCHIVED">Archived</option>
+                                    </select>
                                 </div>
                                 <span className="text-xs text-gray-400 font-mono">ID: {cls.id}</span>
                             </div>
