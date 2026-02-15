@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClassById, checkEnrollment, enrollStudent, createReview, getApprovedClassReviews, getClassReviewStats } from "../../../services/api";
+import { getClassById, checkEnrollment, enrollStudent, createReview, getApprovedClassReviews, getClassReviewStats, getMyPayments } from "../../../services/api";
 import { AuthContext } from "../../../context/AuthContext";
 import {
     Loader2,
@@ -49,12 +49,8 @@ const StudentClassDetails: React.FC = () => {
     const [isEnrolled, setIsEnrolled] = useState(false);
     const [enrollLoading, setEnrollLoading] = useState(false);
 
-    // Simulate Payment State with LocalStorage
-    const [paidMonths, setPaidMonths] = useState<Set<string>>(() => {
-        const saved = localStorage.getItem(`paid_months_${id}`);
-        return saved ? new Set(JSON.parse(saved)) : new Set();
-    });
-    const [payingMonth, setPayingMonth] = useState<string | null>(null);
+    // Payment State (Real API)
+    const [paidMonths, setPaidMonths] = useState<Set<string>>(new Set());
 
     // Review State
     const [reviews, setReviews] = useState<any[]>([]);
@@ -70,15 +66,9 @@ const StudentClassDetails: React.FC = () => {
             fetchClassDetails();
             checkEnrollmentStatus();
             fetchReviews();
+            fetchPayments();
         }
     }, [id]);
-
-    // Save to local storage whenever paidMonths changes
-    useEffect(() => {
-        if (id) {
-            localStorage.setItem(`paid_months_${id}`, JSON.stringify(Array.from(paidMonths)));
-        }
-    }, [paidMonths, id]);
 
     const fetchClassDetails = async () => {
         if (!id) return;
@@ -101,6 +91,19 @@ const StudentClassDetails: React.FC = () => {
             setIsEnrolled(enrolled);
         } catch (err) {
             console.error("Failed to check enrollment", err);
+        }
+    };
+
+    const fetchPayments = async () => {
+        if (!id) return;
+        try {
+            const payments = await getMyPayments();
+            const classPayments = payments
+                .filter((p: any) => p.classId === id && p.status === 'COMPLETED')
+                .map((p: any) => p.yearMonth);
+            setPaidMonths(new Set(classPayments));
+        } catch (err) {
+            console.error("Failed to fetch payments", err);
         }
     };
 
@@ -131,20 +134,6 @@ const StudentClassDetails: React.FC = () => {
         } finally {
             setEnrollLoading(false);
         }
-    };
-
-    const handlePay = (yearMonth: string) => {
-        setPayingMonth(yearMonth);
-        // Simulate API call
-        setTimeout(() => {
-            setPaidMonths(prev => {
-                const newSet = new Set(prev);
-                newSet.add(yearMonth);
-                return newSet;
-            });
-            setPayingMonth(null);
-            alert(`Payment successful for ${yearMonth}! Content unlocked.`);
-        }, 1500);
     };
 
     const handleSubmitReview = async (e: React.FormEvent) => {
@@ -268,15 +257,16 @@ const StudentClassDetails: React.FC = () => {
                         <div className="space-y-4">
                             <div className="space-y-4">
                                 {(classData.months || []).map((month, index) => {
-                                    const isPaid = paidMonths.has(month.yearMonth); // Check if paid
+                                    const isPaid = paidMonths.has(month.yearMonth); // Check real payment
 
                                     return (
                                         <div
                                             key={index}
-                                            className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${(isEnrolled && isPaid && month.released) ? "bg-white hover:border-purple-200 cursor-pointer shadow-sm" : "bg-gray-50/50"
+                                            className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${(isEnrolled && month.released) ? "bg-white hover:border-purple-200 cursor-pointer shadow-sm" : "bg-gray-50/50"
                                                 }`}
                                             onClick={() => {
-                                                if (isEnrolled && isPaid && month.released) {
+                                                if (isEnrolled && month.released) {
+                                                    // Navigate regardless of payment - MonthDetails handles the Lock
                                                     navigate(`/dashboard/browse/${id}/months/${month.yearMonth}`);
                                                 }
                                             }}
@@ -309,17 +299,16 @@ const StudentClassDetails: React.FC = () => {
                                                             </span>
                                                         )
                                                     ) : (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handlePay(month.yearMonth);
-                                                            }}
-                                                            disabled={payingMonth === month.yearMonth}
-                                                            className="flex items-center gap-2 px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-lg active:scale-95"
-                                                        >
-                                                            {payingMonth === month.yearMonth ? <Loader2 size={14} className="animate-spin" /> : <DollarSign size={14} />}
-                                                            Pay to Unlock
-                                                        </button>
+                                                        // Show "Locked" or "Purchase Request" instead of a button
+                                                        month.released ? (
+                                                            <span className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                                <Lock size={14} /> Click to Unlock
+                                                            </span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                                <Lock size={14} /> Releasing Soon
+                                                            </span>
+                                                        )
                                                     )
                                                 ) : (
                                                     <div className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-xs font-bold uppercase tracking-wider">
