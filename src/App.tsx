@@ -18,6 +18,7 @@ import MonthDetails from "./pages/MonthDetails";
 import QuizEditor from "./pages/QuizEditor";
 import StudentBrowse from "./pages/dashboards/student/StudentBrowse";
 import StudentClassDetails from "./pages/dashboards/student/StudentClassDetails";
+import StudentMonthDetails from "./pages/dashboards/student/StudentMonthDetails";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -75,6 +76,7 @@ export default function App() {
             <Route path="classes" element={<Classes />} />
             <Route path="browse" element={<StudentBrowse />} />
             <Route path="browse/:id" element={<StudentClassDetails />} />
+            <Route path="browse/:id/months/:yearMonth" element={<StudentMonthDetails />} />
             <Route path="classes/:id" element={<ClassDetails />} />
             <Route path="classes/:classId/months/:yearMonth" element={<MonthDetails />} />
             <Route path="quiz/:quizId" element={<QuizEditor />} />

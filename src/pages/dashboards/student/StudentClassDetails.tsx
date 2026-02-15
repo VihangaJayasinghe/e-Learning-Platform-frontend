@@ -48,12 +48,26 @@ const StudentClassDetails: React.FC = () => {
     const [isEnrolled, setIsEnrolled] = useState(false);
     const [enrollLoading, setEnrollLoading] = useState(false);
 
+    // Simulate Payment State with LocalStorage
+    const [paidMonths, setPaidMonths] = useState<Set<string>>(() => {
+        const saved = localStorage.getItem(`paid_months_${id}`);
+        return saved ? new Set(JSON.parse(saved)) : new Set();
+    });
+    const [payingMonth, setPayingMonth] = useState<string | null>(null);
+
     useEffect(() => {
         if (id) {
             fetchClassDetails();
             checkEnrollmentStatus();
         }
     }, [id]);
+
+    // Save to local storage whenever paidMonths changes
+    useEffect(() => {
+        if (id) {
+            localStorage.setItem(`paid_months_${id}`, JSON.stringify(Array.from(paidMonths)));
+        }
+    }, [paidMonths, id]);
 
     const fetchClassDetails = async () => {
         if (!id) return;
@@ -92,6 +106,20 @@ const StudentClassDetails: React.FC = () => {
         } finally {
             setEnrollLoading(false);
         }
+    };
+
+    const handlePay = (yearMonth: string) => {
+        setPayingMonth(yearMonth);
+        // Simulate API call
+        setTimeout(() => {
+            setPaidMonths(prev => {
+                const newSet = new Set(prev);
+                newSet.add(yearMonth);
+                return newSet;
+            });
+            setPayingMonth(null);
+            alert(`Payment successful for ${yearMonth}! Content unlocked.`);
+        }, 1500);
     };
 
     if (loading) {
@@ -187,53 +215,72 @@ const StudentClassDetails: React.FC = () => {
                         </div>
 
                         <div className="space-y-4">
-                            {(classData.months || []).map((month, index) => (
-                                <div
-                                    key={index}
-                                    className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${isEnrolled ? "bg-white hover:border-purple-200 cursor-pointer" : "bg-gray-50/50"
-                                        }`}
-                                    onClick={() => {
-                                        if (isEnrolled && month.released) {
-                                            // Future: Expand logic or navigate to Month View
-                                            // navigate(`/dashboard/classes/${id}/months/${month.yearMonth}`);
-                                        }
-                                    }}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`h-12 w-12 rounded-xl border flex items-center justify-center font-bold shadow-sm transition-colors ${isEnrolled ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-white text-gray-400 border-gray-200"
-                                            }`}>
-                                            {index + 1}
-                                        </div>
-                                        <div>
-                                            <h4 className={`font-bold ${isEnrolled ? "text-gray-900" : "text-gray-700"}`}>
-                                                {month.displayName}
-                                            </h4>
-                                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                                                {month.yearMonth}
-                                            </p>
-                                        </div>
-                                    </div>
+                            <div className="space-y-4">
+                                {(classData.months || []).map((month, index) => {
+                                    const isPaid = paidMonths.has(month.yearMonth); // Check if paid
 
-                                    <div className="flex items-center gap-2">
-                                        {isEnrolled ? (
-                                            month.released ? (
-                                                <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-xs font-bold uppercase tracking-wider">
-                                                    <Unlock size={14} /> Unlocked
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold uppercase tracking-wider">
-                                                    <Lock size={14} /> Opening Soon
-                                                </span>
-                                            )
-                                        ) : (
-                                            <div className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-xs font-bold uppercase tracking-wider">
-                                                <Lock size={14} />
-                                                Locked
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${(isEnrolled && isPaid && month.released) ? "bg-white hover:border-purple-200 cursor-pointer shadow-sm" : "bg-gray-50/50"
+                                                }`}
+                                            onClick={() => {
+                                                if (isEnrolled && isPaid && month.released) {
+                                                    navigate(`/dashboard/browse/${id}/months/${month.yearMonth}`);
+                                                }
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`h-12 w-12 rounded-xl border flex items-center justify-center font-bold shadow-sm transition-colors ${(isEnrolled && isPaid) ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-white text-gray-400 border-gray-200"
+                                                    }`}>
+                                                    {index + 1}
+                                                </div>
+                                                <div>
+                                                    <h4 className={`font-bold ${(isEnrolled && isPaid) ? "text-gray-900" : "text-gray-700"}`}>
+                                                        {month.displayName}
+                                                    </h4>
+                                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                                                        {month.yearMonth}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
+
+                                            <div className="flex items-center gap-2">
+                                                {isEnrolled ? (
+                                                    isPaid ? (
+                                                        month.released ? (
+                                                            <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                                <Unlock size={14} /> Unlocked
+                                                            </span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                                <Lock size={14} /> Opening Soon
+                                                            </span>
+                                                        )
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handlePay(month.yearMonth);
+                                                            }}
+                                                            disabled={payingMonth === month.yearMonth}
+                                                            className="flex items-center gap-2 px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-lg active:scale-95"
+                                                        >
+                                                            {payingMonth === month.yearMonth ? <Loader2 size={14} className="animate-spin" /> : <DollarSign size={14} />}
+                                                            Pay to Unlock
+                                                        </button>
+                                                    )
+                                                ) : (
+                                                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                        <Lock size={14} />
+                                                        Locked
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
