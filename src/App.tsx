@@ -14,6 +14,13 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ClassDetails from "./pages/ClassDetails";
+import MonthDetails from "./pages/MonthDetails";
+import QuizEditor from "./pages/QuizEditor";
+import StudentBrowse from "./pages/dashboards/student/StudentBrowse";
+import StudentClassDetails from "./pages/dashboards/student/StudentClassDetails";
+import StudentMonthDetails from "./pages/dashboards/student/StudentMonthDetails";
+import VideoPlayerPage from "./pages/VideoPlayerPage";
+import Videos from "./pages/Videos";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -41,6 +48,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     );
   }
 
+  console.log("PrivateRoute check:", { path: window.location.pathname, user: !!user, loading });
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
@@ -69,13 +77,28 @@ export default function App() {
           >
             <Route index element={<DashboardIndex />} />
             <Route path="classes" element={<Classes />} />
+            <Route path="browse" element={<StudentBrowse />} />
+            <Route path="browse/:id" element={<StudentClassDetails />} />
+            <Route path="browse/:id/months/:yearMonth" element={<StudentMonthDetails />} />
             <Route path="classes/:id" element={<ClassDetails />} />
+            <Route path="classes/:classId/months/:yearMonth" element={<MonthDetails />} />
+            <Route path="quiz/:quizId" element={<QuizEditor />} />
+            <Route path="quiz/:quizId" element={<QuizEditor />} />
+            <Route path="videos" element={<Videos />} />
           </Route>
           <Route
             path="/profile"
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/video/:videoId"
+            element={
+              <PrivateRoute>
+                <VideoPlayerPage />
               </PrivateRoute>
             }
           />
