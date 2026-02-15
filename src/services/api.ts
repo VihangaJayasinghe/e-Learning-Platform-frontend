@@ -24,7 +24,21 @@ export const classApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+export const enrollmentApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/enrollments",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // 4. Service functions
+// --- Class Service ---
+export const getAllClasses = async () => {
+  const response = await classApi.get("");
+  return response.data;
+};
+
 export const fetchClassesByInstructor = async (username: string) => {
   const response = await classApi.get(`/instructor/${username}`);
   return response.data;
@@ -79,7 +93,23 @@ export const getMonthDocuments = async (classId: string, yearMonth: string) => {
   return response.data;
 };
 
-// Video API
+// --- Enrollment Service ---
+export const enrollStudent = async (classId: string) => {
+  const response = await enrollmentApi.post(`/enroll/${classId}`);
+  return response.data;
+};
+
+export const getStudentEnrollments = async () => {
+  const response = await enrollmentApi.get("/my-enrollments");
+  return response.data;
+};
+
+export const checkEnrollment = async (classId: string) => {
+  const response = await enrollmentApi.get(`/check/${classId}`);
+  return response.data;
+};
+
+// --- Video API ---
 export const videoApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/videos",
   headers: {
