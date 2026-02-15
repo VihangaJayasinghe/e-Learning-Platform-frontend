@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Loader2, X, Upload, CheckCircle } from "lucide-react";
+import { Loader2, X, Upload } from "lucide-react";
 import { uploadVideo, addVideoToMonth, fetchClassesByInstructor, getClassById } from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -28,7 +28,8 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
     classId,
     yearMonth,
 }) => {
-    const { user } = useContext(AuthContext); // Need user for fetching classes
+    const auth = useContext(AuthContext);
+    const user = auth?.user;
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);

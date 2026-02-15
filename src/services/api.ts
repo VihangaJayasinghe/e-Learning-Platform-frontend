@@ -46,7 +46,7 @@ export const updateClass = async (id: string, classData: any) => {
 };
 
 export const updateClassStatus = async (id: string, status: string) => {
-  const response = await classApi.patch(`/${id}/status?status=${status}`, {});
+  const response = await classApi.put(`/${id}/status?status=${status}`, {});
   return response.data;
 };
 

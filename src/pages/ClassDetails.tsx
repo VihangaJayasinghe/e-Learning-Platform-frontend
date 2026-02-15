@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { getClassById, extendClassDuration, updateClassStatus, deleteClass, releaseMonth, unreleaseMonth } from "../services/api";
 import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, CheckCircle, XCircle, Trash2, Lock, Unlock } from "lucide-react";
 import ClassFormModal from "../components/modals/CreateClassModal";
+import { ClassStatus } from "../types";
 
 interface ClassDetailsData {
     id: string;
@@ -24,7 +25,7 @@ interface ClassDetailsData {
         displayName: string;
         released: boolean;
     }[];
-    status: string;
+    status: ClassStatus;
     averageRating: number;
     totalReviews: number;
 }
@@ -43,6 +44,43 @@ const ClassDetails: React.FC = () => {
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
 
+
+    const handlePublish = async () => {
+        if (!classData || !id) return;
+        if (!window.confirm("Are you sure you want to PUBLISH this class? It will be visible to students.")) return;
+
+        try {
+            setActionLoading(true);
+            await updateClassStatus(id, ClassStatus.ACTIVE);
+            await fetchClassDetails();
+            alert("Class published successfully!");
+        } catch (err: any) {
+            console.error("Failed to publish class", err);
+            const errorMessage = err.response?.data?.message || "Failed to publish class";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleUnpublish = async () => {
+        if (!classData || !id) return;
+        if (!window.confirm("Are you sure you want to UNPUBLISH this class? It will be hidden from students.")) return;
+
+        try {
+            setActionLoading(true);
+            await updateClassStatus(id, ClassStatus.DRAFT);
+            await fetchClassDetails();
+            alert("Class unpublished (Draft) successfully!");
+        } catch (err: any) {
+            console.error("Failed to unpublish class", err);
+            const errorMessage = err.response?.data?.message || "Failed to unpublish class";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handleExtendDuration = async () => {
         if (!classData || !id) return;
         try {
@@ -54,24 +92,6 @@ const ClassDetails: React.FC = () => {
         } catch (err: any) {
             console.error("Failed to extend duration", err);
             alert(err.response?.data?.message || "Failed to extend duration");
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleUpdateStatus = async () => {
-        if (!classData || !id) return;
-        const newStatus = classData.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
-        if (!window.confirm(`Are you sure you want to change the status to ${newStatus}?`)) return;
-
-        try {
-            setActionLoading(true);
-            await updateClassStatus(id, newStatus);
-            await fetchClassDetails();
-        } catch (err: any) {
-            console.error("Failed to update status", err);
-            const errorMessage = err.response?.data?.message || "Failed to update status";
-            alert(`${errorMessage} (Status: ${err.response?.status})`);
         } finally {
             setActionLoading(false);
         }
@@ -167,14 +187,25 @@ const ClassDetails: React.FC = () => {
 
                 {isOwner && (
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleUpdateStatus}
-                            disabled={actionLoading}
-                            className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors shadow-sm ${classData.status === 'PUBLISHED' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-600 hover:bg-green-700'}`}
-                        >
-                            {classData.status === 'PUBLISHED' ? <XCircle size={18} /> : <CheckCircle size={18} />}
-                            {classData.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
-                        </button>
+                        {/* Publish/Unpublish Buttons */}
+                        {classData.status === ClassStatus.DRAFT && (
+                            <button
+                                onClick={handlePublish}
+                                disabled={actionLoading}
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                            >
+                                <CheckCircle size={18} /> Publish
+                            </button>
+                        )}
+                        {classData.status === ClassStatus.ACTIVE && (
+                            <button
+                                onClick={handleUnpublish}
+                                disabled={actionLoading}
+                                className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow-sm"
+                            >
+                                <XCircle size={18} /> Unpublish
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsExtendModalOpen(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
@@ -203,7 +234,7 @@ const ClassDetails: React.FC = () => {
                     {/* Header Card */}
                     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                         <div className="flex justify-between items-start mb-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${classData.status === 'PUBLISHED' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${classData.status === ClassStatus.ACTIVE ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
                                 }`}>
                                 {classData.status}
                             </span>
