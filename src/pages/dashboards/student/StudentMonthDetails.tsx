@@ -5,7 +5,9 @@ import {
     getMonthDocuments,
     getQuizzesByClassAndMonth,
     getVideoById,
-    getDocumentById
+    getDocumentById,
+    checkMonthAccess,
+    getClassById // We need class details for price/name
 } from "../../../services/api";
 import {
     ArrowLeft,
@@ -14,8 +16,10 @@ import {
     HelpCircle,
     Loader2,
     PlayCircle,
-    Eye
+    Eye,
+    Lock
 } from "lucide-react";
+import PaymentModal from "../../../components/modals/PaymentModal";
 
 interface VideoData {
     id: string;
@@ -52,9 +56,40 @@ const StudentMonthDetails: React.FC = () => {
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState<'videos' | 'documents' | 'quizzes'>('videos');
 
+    // Access Control
+    const [hasAccess, setHasAccess] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [classDetails, setClassDetails] = useState<any>(null); // For price info
+
     useEffect(() => {
-        fetchData();
+        if (classId && yearMonth) {
+            checkAccess();
+        }
     }, [classId, yearMonth]);
+
+    const checkAccess = async () => {
+        if (!classId || !yearMonth) return;
+        try {
+            setLoading(true);
+            const [access, classData] = await Promise.all([
+                checkMonthAccess(classId, yearMonth),
+                getClassById(classId)
+            ]);
+
+            setHasAccess(access);
+            setClassDetails(classData);
+
+            if (access) {
+                await fetchData();
+            } else {
+                setLoading(false); // Stop loading if no access, show lock screen
+            }
+        } catch (err) {
+            console.error("Failed to check access", err);
+            setError("Failed to verify access.");
+            setLoading(false);
+        }
+    };
 
     const fetchData = async () => {
         if (!classId || !yearMonth) return;
@@ -107,6 +142,48 @@ const StudentMonthDetails: React.FC = () => {
                 >
                     <ArrowLeft size={20} /> Go Back
                 </button>
+            </div>
+        );
+    }
+
+    // --- NO ACCESS STATE ---
+    if (!hasAccess && classDetails) {
+        return (
+            <div className="max-w-4xl mx-auto p-8 text-center min-h-[60vh] flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
+                    <Lock size={40} />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Content Locked</h1>
+                <p className="text-gray-500 max-w-md mx-auto mb-8">
+                    Purchase access to <span className="font-bold text-gray-800">{classDetails.className} - {yearMonth}</span> to view videos, documents, and quizzes.
+                </p>
+
+                <button
+                    onClick={() => setShowPaymentModal(true)}
+                    className="px-8 py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-200 hover:bg-teal-700 transition-all transform hover:-translate-y-1"
+                >
+                    Unlock for ${classDetails.monthlyPrice}
+                </button>
+
+                <button
+                    onClick={() => navigate(-1)}
+                    className="mt-6 text-gray-500 hover:text-gray-700 text-sm font-medium"
+                >
+                    Go Back
+                </button>
+
+                <PaymentModal
+                    isOpen={showPaymentModal}
+                    onClose={() => setShowPaymentModal(false)}
+                    onSuccess={() => {
+                        setHasAccess(true);
+                        fetchData(); // Load content after successful payment
+                    }}
+                    classId={classId!}
+                    className={classDetails.className}
+                    yearMonth={yearMonth!}
+                    amount={classDetails.monthlyPrice}
+                />
             </div>
         );
     }
@@ -170,14 +247,12 @@ const StudentMonthDetails: React.FC = () => {
                                 <div className="p-6">
                                     <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{video.videoName}</h3>
                                     <p className="text-sm text-gray-500 line-clamp-2 mb-4">{video.description}</p>
-                                    <a
-                                        href={video.firebaseUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={() => navigate(`/video/${video.id}`)}
                                         className="inline-flex items-center gap-2 text-purple-600 font-bold text-sm hover:underline"
                                     >
                                         <PlayCircle size={16} /> Watch Now
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         ))}

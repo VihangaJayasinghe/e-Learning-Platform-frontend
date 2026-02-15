@@ -206,6 +206,57 @@ export const getQuizzesByClassAndMonth = async (classId: string, monthId: string
   return response.data;
 };
 
+// --- Payments ---
+export const paymentApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/payments",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const initiatePayment = async (classId: string, yearMonth: string, amount: number) => {
+  const response = await paymentApi.post('/initiate', { classId, yearMonth, amount });
+  return response.data;
+};
+
+export const completePayment = async (paymentId: string) => {
+  const response = await paymentApi.post(`/complete/${paymentId}`);
+  return response.data;
+};
+
+export const checkMonthAccess = async (classId: string, yearMonth: string) => {
+  // Access check is often a GET on the payments resource or a dedicated endpoint. 
+  // Based on doc: GET /api/payments/access/{classId}/{yearMonth}
+  const response = await paymentApi.get(`/access/${classId}/${yearMonth}`);
+  return response.data;
+};
+
+export const getMyPayments = async () => {
+  const response = await paymentApi.get('/my-payments');
+  return response.data;
+};
+
+// --- Teacher Analytics ---
+// The doc says: GET /api/teachers/payments. This might be a separate controller. 
+// Let's use a specific call or the default api if it's under users, but doc says /api/teachers/payments.
+// Assuming it's distinct, let's use the full URL or a teacherApi if needed.
+// For now, let's try using the paymentApi if the backend groups it there, OR creating a teacherApi.
+// Actually, looking at the doc: "Teacher Analytics API Endpoint: GET /api/teachers/payments".
+// This is likely a different base URL than /api/payments.
+export const teacherApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/teachers",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const getTeacherPayments = async () => {
+  const response = await teacherApi.get('/payments');
+  return response.data;
+};
+
 export const createQuiz = async (quizData: any) => {
   const response = await quizApi.post("", quizData);
   return response.data;
