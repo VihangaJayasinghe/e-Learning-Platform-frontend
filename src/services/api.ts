@@ -107,6 +107,11 @@ export const deleteVideo = async (id: string) => {
   await videoApi.delete(`/${id}`);
 };
 
+export const getVideosByUser = async (username: string) => {
+  const response = await videoApi.get(`/user/${username}`);
+  return response.data;
+};
+
 // Document API
 export const documentApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/documents", // Check controller path
