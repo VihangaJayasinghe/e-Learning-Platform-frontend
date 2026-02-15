@@ -170,7 +170,7 @@ const VideoPlayerPage: React.FC = () => {
                         }
                     };
 
-                    qualityLevels.on('addqualitylevel', (event: any) => {
+                    qualityLevels.on('addqualitylevel', (_event: any) => {
                         handleQualityUpdate();
                     });
 

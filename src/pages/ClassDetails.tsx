@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { getClassById, extendClassDuration, updateClassStatus, deleteClass } from "../services/api";
-import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { getClassById, extendClassDuration, updateClassStatus, deleteClass, releaseMonth, unreleaseMonth } from "../services/api";
+import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, CheckCircle, XCircle, Trash2, Lock, Unlock } from "lucide-react";
 import ClassFormModal from "../components/modals/CreateClassModal";
+import { ClassStatus } from "../types";
 
 interface ClassDetailsData {
     id: string;
@@ -24,7 +25,7 @@ interface ClassDetailsData {
         displayName: string;
         released: boolean;
     }[];
-    status: string;
+    status: ClassStatus;
     averageRating: number;
     totalReviews: number;
 }
@@ -43,34 +44,65 @@ const ClassDetails: React.FC = () => {
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
 
-    const handleExtendDuration = async () => {
+
+    const handlePublish = async () => {
         if (!classData || !id) return;
+        if (!window.confirm("Are you sure you want to PUBLISH this class? It will be visible to students.")) return;
+
         try {
             setActionLoading(true);
-            await extendClassDuration(id, extendMonths);
-            await fetchClassDetails(); // Refresh data
-            setIsExtendModalOpen(false);
-            setExtendMonths(1); // Reset
+            await updateClassStatus(id, ClassStatus.ACTIVE);
+            await fetchClassDetails();
+            alert("Class published successfully!");
         } catch (err: any) {
-            console.error("Failed to extend duration", err);
-            alert(err.response?.data?.message || "Failed to extend duration");
+            console.error("Failed to publish class", err);
+            const errorMessage = err.response?.data?.message || "Failed to publish class";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
         } finally {
             setActionLoading(false);
         }
     };
 
-    const handleUpdateStatus = async () => {
+    const handleUnpublish = async () => {
         if (!classData || !id) return;
-        const newStatus = classData.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
-        if (!window.confirm(`Are you sure you want to change the status to ${newStatus}?`)) return;
+        if (!window.confirm("Are you sure you want to UNPUBLISH this class? It will be hidden from students.")) return;
 
         try {
             setActionLoading(true);
-            await updateClassStatus(id, newStatus);
+            await updateClassStatus(id, ClassStatus.DRAFT);
             await fetchClassDetails();
+            alert("Class unpublished (Draft) successfully!");
         } catch (err: any) {
-            console.error("Failed to update status", err);
-            alert(err.response?.data?.message || "Failed to update status");
+            console.error("Failed to unpublish class", err);
+            const errorMessage = err.response?.data?.message || "Failed to unpublish class";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleExtendDuration = async () => {
+        if (!classData || !id) return;
+
+        // Basic validation
+        if (extendMonths < 1) {
+            alert("Please enter a valid number of months (minimum 1).");
+            return;
+        }
+
+        if (!window.confirm(`Are you sure you want to extend this class by ${extendMonths} month(s)?`)) return;
+
+        try {
+            setActionLoading(true);
+            await extendClassDuration(id, extendMonths);
+            await fetchClassDetails(); // Refresh data to show new duration
+            setIsExtendModalOpen(false);
+            setExtendMonths(1); // Reset form
+            alert(`Class duration extended by ${extendMonths} month(s) successfully!`);
+        } catch (err: any) {
+            console.error("Failed to extend duration", err);
+            const errorMessage = err.response?.data?.message || "Failed to extend duration";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
         } finally {
             setActionLoading(false);
         }
@@ -88,6 +120,25 @@ const ClassDetails: React.FC = () => {
             console.error("Failed to delete class", err);
             alert(err.response?.data?.message || "Failed to delete class");
             setActionLoading(false);
+        }
+    };
+
+    const handleToggleMonthStatus = async (yearMonth: string, currentStatus: boolean, e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent navigation
+        if (!classData || !id) return;
+
+        try {
+            // Optimistic update or just reload
+            // Let's reload to be safe and simple
+            if (currentStatus) {
+                await unreleaseMonth(id, yearMonth);
+            } else {
+                await releaseMonth(id, yearMonth);
+            }
+            await fetchClassDetails();
+        } catch (err: any) {
+            console.error("Failed to update month status", err);
+            alert(err.response?.data?.message || "Failed to update month status");
         }
     };
 
@@ -147,14 +198,25 @@ const ClassDetails: React.FC = () => {
 
                 {isOwner && (
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleUpdateStatus}
-                            disabled={actionLoading}
-                            className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors shadow-sm ${classData.status === 'PUBLISHED' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-600 hover:bg-green-700'}`}
-                        >
-                            {classData.status === 'PUBLISHED' ? <XCircle size={18} /> : <CheckCircle size={18} />}
-                            {classData.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
-                        </button>
+                        {/* Publish/Unpublish Buttons */}
+                        {classData.status === ClassStatus.DRAFT && (
+                            <button
+                                onClick={handlePublish}
+                                disabled={actionLoading}
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                            >
+                                <CheckCircle size={18} /> Publish
+                            </button>
+                        )}
+                        {classData.status === ClassStatus.ACTIVE && (
+                            <button
+                                onClick={handleUnpublish}
+                                disabled={actionLoading}
+                                className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow-sm"
+                            >
+                                <XCircle size={18} /> Unpublish
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsExtendModalOpen(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
@@ -183,7 +245,7 @@ const ClassDetails: React.FC = () => {
                     {/* Header Card */}
                     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                         <div className="flex justify-between items-start mb-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${classData.status === 'PUBLISHED' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${classData.status === ClassStatus.ACTIVE ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
                                 }`}>
                                 {classData.status}
                             </span>
@@ -248,10 +310,24 @@ const ClassDetails: React.FC = () => {
                                                 <p className="text-sm text-gray-500">Year-Month: {month.yearMonth}</p>
                                             </div>
                                         </div>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${month.released ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                                            }`}>
-                                            {month.released ? 'Released' : 'Locked'}
-                                        </span>
+                                        <div className="flex items-center gap-3">
+                                            {isOwner && (
+                                                <button
+                                                    onClick={(e) => handleToggleMonthStatus(month.yearMonth, month.released, e)}
+                                                    className={`p-2 rounded-full transition-colors ${month.released
+                                                        ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                                        }`}
+                                                    title={month.released ? "Unrelease Month" : "Release Month"}
+                                                >
+                                                    {month.released ? <Unlock size={16} /> : <Lock size={16} />}
+                                                </button>
+                                            )}
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${month.released ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                {month.released ? 'Released' : 'Locked'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -313,89 +389,93 @@ const ClassDetails: React.FC = () => {
                 classId={classData?.id}
             />
             {/* Extend Modal */}
-            {isExtendModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Extend Class Duration</h3>
-                        <p className="text-gray-500 mb-6">Add more months to the course content.</p>
+            {
+                isExtendModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Extend Class Duration</h3>
+                            <p className="text-gray-500 mb-6">Add more months to the course content.</p>
 
-                        <div className="mb-6">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Additional Months
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="12"
-                                value={extendMonths}
-                                onChange={(e) => setExtendMonths(parseInt(e.target.value) || 1)}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
-                            />
-                        </div>
+                            <div className="mb-6">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Additional Months
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="12"
+                                    value={extendMonths}
+                                    onChange={(e) => setExtendMonths(parseInt(e.target.value) || 1)}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                                />
+                            </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setIsExtendModalOpen(false)}
-                                className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleExtendDuration}
-                                disabled={actionLoading}
-                                className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 flex items-center justify-center"
-                            >
-                                {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Extend"}
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setIsExtendModalOpen(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleExtendDuration}
+                                    disabled={actionLoading}
+                                    className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 flex items-center justify-center"
+                                >
+                                    {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Extend"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Delete Confirmation Modal */}
-            {isDeleteModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Class</h3>
-                        <p className="text-gray-500 mb-4">
-                            Are you sure you want to delete this class? This action cannot be undone.
-                        </p>
-                        <p className="text-sm text-gray-600 mb-4">
-                            Type <span className="font-bold select-all">{classData?.className}</span> to confirm.
-                        </p>
+            {
+                isDeleteModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Class</h3>
+                            <p className="text-gray-500 mb-4">
+                                Are you sure you want to delete this class? This action cannot be undone.
+                            </p>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Type <span className="font-bold select-all">{classData?.className}</span> to confirm.
+                            </p>
 
-                        <div className="mb-6">
-                            <input
-                                type="text"
-                                value={deleteConfirmation}
-                                onChange={(e) => setDeleteConfirmation(e.target.value)}
-                                placeholder="Type class name"
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
-                            />
-                        </div>
+                            <div className="mb-6">
+                                <input
+                                    type="text"
+                                    value={deleteConfirmation}
+                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                    placeholder="Type class name"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                />
+                            </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => {
-                                    setIsDeleteModalOpen(false);
-                                    setDeleteConfirmation("");
-                                }}
-                                className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDeleteClass}
-                                disabled={actionLoading || deleteConfirmation !== classData?.className}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete"}
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setIsDeleteModalOpen(false);
+                                        setDeleteConfirmation("");
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDeleteClass}
+                                    disabled={actionLoading || deleteConfirmation !== classData?.className}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

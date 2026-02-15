@@ -60,12 +60,14 @@ export const updateClass = async (id: string, classData: any) => {
 };
 
 export const updateClassStatus = async (id: string, status: string) => {
-  const response = await classApi.patch(`/${id}/status?status=${status}`);
+  const response = await classApi.put(`/${id}/status?status=${status}`, {});
   return response.data;
 };
 
 export const extendClassDuration = async (id: string, additionalMonths: number) => {
-  const response = await classApi.patch(`/${id}/extend?additionalMonths=${additionalMonths}`);
+  const response = await classApi.post(`/${id}/extend`, {}, {
+    params: { additionalMonths }
+  });
   return response.data;
 };
 
@@ -93,6 +95,17 @@ export const getMonthDocuments = async (classId: string, yearMonth: string) => {
   return response.data;
 };
 
+export const releaseMonth = async (classId: string, yearMonth: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/release`);
+  return response.data;
+};
+
+export const unreleaseMonth = async (classId: string, yearMonth: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/unrelease`);
+  return response.data;
+};
+
+// Video API
 // --- Enrollment Service ---
 export const enrollStudent = async (classId: string) => {
   const response = await enrollmentApi.post(`/enroll/${classId}`);
@@ -135,6 +148,11 @@ export const uploadVideo = async (formData: FormData, onUploadProgress?: (progre
 
 export const deleteVideo = async (id: string) => {
   await videoApi.delete(`/${id}`);
+};
+
+export const getVideosByUser = async (username: string) => {
+  const response = await videoApi.get(`/user/${username}`);
+  return response.data;
 };
 
 // Document API
