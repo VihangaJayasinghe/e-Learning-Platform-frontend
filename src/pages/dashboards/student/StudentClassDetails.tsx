@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClassById, checkEnrollment, enrollStudent } from "../../../services/api";
+import { getClassById, checkEnrollment, enrollStudent, createReview, getApprovedClassReviews, getClassReviewStats } from "../../../services/api";
+import { AuthContext } from "../../../context/AuthContext";
 import {
     Loader2,
     ArrowLeft,
@@ -11,8 +12,8 @@ import {
     User,
     Lock,
     Unlock,
-    BookOpen,
-    PlayCircle
+    PlayCircle,
+    CheckCircle
 } from "lucide-react";
 
 interface ClassDetailsData {
@@ -55,10 +56,20 @@ const StudentClassDetails: React.FC = () => {
     });
     const [payingMonth, setPayingMonth] = useState<string | null>(null);
 
+    // Review State
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [stats, setStats] = useState<any>(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+    const [reviewSubmitting, setReviewSubmitting] = useState(false);
+    const authContext = React.useContext(AuthContext); // Use context safely
+    const user = authContext?.user;
+
     useEffect(() => {
         if (id) {
             fetchClassDetails();
             checkEnrollmentStatus();
+            fetchReviews();
         }
     }, [id]);
 
@@ -93,6 +104,20 @@ const StudentClassDetails: React.FC = () => {
         }
     };
 
+    const fetchReviews = async () => {
+        if (!id) return;
+        try {
+            const [reviewsData, statsData] = await Promise.all([
+                getApprovedClassReviews(id),
+                getClassReviewStats(id)
+            ]);
+            setReviews(reviewsData);
+            setStats(statsData);
+        } catch (err) {
+            console.error("Failed to load reviews", err);
+        }
+    };
+
     const handleEnroll = async () => {
         if (!id) return;
         try {
@@ -122,6 +147,32 @@ const StudentClassDetails: React.FC = () => {
         }, 1500);
     };
 
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id || !user) return;
+
+        try {
+            setReviewSubmitting(true);
+            await createReview({
+                studentId: user.id,
+                studentName: user.username,
+                targetId: id,
+                targetType: "CLASS",
+                rating: reviewForm.rating,
+                comment: reviewForm.comment
+            });
+            setShowReviewModal(false);
+            setReviewForm({ rating: 5, comment: "" });
+            alert("Review submitted successfully! It will be visible after approval.");
+            fetchReviews(); // Refresh list
+        } catch (err: any) {
+            console.error("Failed to submit review", err);
+            alert("Failed to submit review. Please try again.");
+        } finally {
+            setReviewSubmitting(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px] text-purple-600">
@@ -145,7 +196,7 @@ const StudentClassDetails: React.FC = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8 pb-12">
             <button
                 onClick={() => navigate(-1)}
                 className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors"
@@ -283,6 +334,58 @@ const StudentClassDetails: React.FC = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Reviews Section */}
+                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Reviews</h2>
+                                <div className="flex items-center gap-2 text-yellow-500">
+                                    <Star fill="currentColor" size={20} />
+                                    <span className="font-bold text-xl text-gray-900">{(stats?.averageRating || classData.averageRating || 0).toFixed(1)}</span>
+                                    <span className="text-gray-400">({reviews.length} reviews)</span>
+                                </div>
+                            </div>
+                            {isEnrolled && (
+                                <button
+                                    onClick={() => setShowReviewModal(true)}
+                                    className="bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-bold hover:bg-purple-100 transition-colors"
+                                >
+                                    Write a Review
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="space-y-6">
+                            {reviews.length === 0 ? (
+                                <div className="text-center py-12 text-gray-400">
+                                    No reviews yet. Be the first to review!
+                                </div>
+                            ) : (
+                                reviews.map((review) => (
+                                    <div key={review.id} className="border-b border-gray-50 last:border-0 pb-6 last:pb-0">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500">
+                                                    {review.studentName?.charAt(0).toUpperCase() || "U"}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-gray-900">{review.studentName}</h4>
+                                                    <div className="flex text-yellow-500 text-xs">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={12} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "text-yellow-500" : "text-gray-300"} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <p className="text-gray-600 leading-relaxed pl-13">{review.comment}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Sidebar */}
@@ -304,7 +407,13 @@ const StudentClassDetails: React.FC = () => {
                                     You are enrolled!
                                 </div>
                                 <button
-                                    onClick={() => {/* Navigate to first month or similar */ }}
+                                    onClick={() => {
+                                        // Navigate to first released month if available
+                                        const firstReleased = classData.months?.find(m => m.released);
+                                        if (firstReleased) {
+                                            navigate(`/dashboard/browse/${id}/months/${firstReleased.yearMonth}`);
+                                        }
+                                    }}
                                     className="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
                                 >
                                     <PlayCircle size={20} /> Continue Learning
@@ -358,16 +467,64 @@ const StudentClassDetails: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Review Modal */}
+            {showReviewModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                        <h3 className="text-xl font-bold text-gray-900 mb-6">Write a Review</h3>
+                        <form onSubmit={handleSubmitReview} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Rating</label>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
+                                            className="focus:outline-none transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                size={32}
+                                                fill={star <= reviewForm.rating ? "currentColor" : "none"}
+                                                className={star <= reviewForm.rating ? "text-yellow-400" : "text-gray-300"}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Your Review</label>
+                                <textarea
+                                    value={reviewForm.comment}
+                                    onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-50 outline-none resize-none h-32"
+                                    placeholder="What did you think about this class?"
+                                    required
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowReviewModal(false)}
+                                    className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={reviewSubmitting}
+                                    className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200 disabled:opacity-70 flex items-center justify-center gap-2"
+                                >
+                                    {reviewSubmitting ? <Loader2 className="animate-spin" size={20} /> : "Submit Review"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
-
-// Missing icon import hack (CheckCircle)
-const CheckCircle = ({ size }: { size: number }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-    </svg>
-);
 
 export default StudentClassDetails;

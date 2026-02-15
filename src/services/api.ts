@@ -227,3 +227,27 @@ export const getQuizStatistics = async (quizId: string) => {
   const response = await quizApi.get(`/quiz/${quizId}/statistics`);
   return response.data;
 };
+
+// Review API
+export const reviewApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/reviews",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const createReview = async (reviewData: any) => {
+  const response = await reviewApi.post("", reviewData);
+  return response.data;
+};
+
+export const getApprovedClassReviews = async (classId: string) => {
+  const response = await reviewApi.get(`/class/${classId}/approved`);
+  return response.data;
+};
+
+export const getClassReviewStats = async (classId: string) => {
+  const response = await reviewApi.get(`/class/${classId}/stats`);
+  return response.data;
+};
