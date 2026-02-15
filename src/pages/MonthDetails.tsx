@@ -266,14 +266,15 @@ const MonthDetails: React.FC = () => {
                                             <PlayCircle size={20} className="text-gray-300 group-hover:text-red-500" />
                                         </div>
                                         <p className="text-sm text-gray-500 line-clamp-2 mb-3">{video.description}</p>
-                                        <a
-                                            href={video.firebaseUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <button
+                                            onClick={() => {
+                                                console.log("Navigating to video:", video.id);
+                                                navigate(`/video/${video.id}`);
+                                            }}
                                             className="text-xs font-bold text-red-600 hover:underline"
                                         >
                                             Watch Video
-                                        </a>
+                                        </button>
                                         <button
                                             onClick={() => handleDeleteClick(video.id)}
                                             className="absolute top-4 right-4 text-gray-300 hover:text-red-600 transition-colors"
