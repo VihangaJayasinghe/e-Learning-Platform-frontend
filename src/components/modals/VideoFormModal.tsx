@@ -21,6 +21,7 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
 
     if (!isOpen) return null;
@@ -42,7 +43,10 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
             formData.append("name", name);
             formData.append("description", description);
 
-            const video = await uploadVideo(formData);
+            const video = await uploadVideo(formData, (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            });
 
             // 2. Add video to the month
             await addVideoToMonth(classId, yearMonth, video.id);
@@ -53,6 +57,7 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
             setName("");
             setDescription("");
             setFile(null);
+            setUploadProgress(0);
         } catch (err: any) {
             console.error("Failed to add video", err);
             setError(err.response?.data?.message || "Failed to add video. Please try again.");
@@ -75,6 +80,22 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
                             {error}
+                        </div>
+                    )}
+
+                    {loading && (
+                        <div className="w-full mb-4">
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                                <div
+                                    className={`h-2.5 rounded-full transition-all duration-300 ease-in-out ${uploadProgress === 100 ? 'bg-teal-500 animate-pulse' : 'bg-teal-600'}`}
+                                    style={{ width: `${uploadProgress}%` }}
+                                ></div>
+                            </div>
+                            <p className={`text-sm mt-2 text-center font-semibold transition-colors ${uploadProgress === 100 ? 'text-teal-600 animate-pulse' : 'text-gray-700'}`}>
+                                {uploadProgress < 100
+                                    ? `${uploadProgress}% Uploaded`
+                                    : "Processing video... This may take a moment."}
+                            </p>
                         </div>
                     )}
 
