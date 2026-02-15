@@ -16,6 +16,7 @@ import Home from "./pages/Home";
 import ClassDetails from "./pages/ClassDetails";
 import MonthDetails from "./pages/MonthDetails";
 import QuizEditor from "./pages/QuizEditor";
+import VideoPlayerPage from "./pages/VideoPlayerPage";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -43,6 +44,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     );
   }
 
+  console.log("PrivateRoute check:", { path: window.location.pathname, user: !!user, loading });
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
@@ -74,12 +76,21 @@ export default function App() {
             <Route path="classes/:id" element={<ClassDetails />} />
             <Route path="classes/:classId/months/:yearMonth" element={<MonthDetails />} />
             <Route path="quiz/:quizId" element={<QuizEditor />} />
+            <Route path="quiz/:quizId" element={<QuizEditor />} />
           </Route>
           <Route
             path="/profile"
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/video/:videoId"
+            element={
+              <PrivateRoute>
+                <VideoPlayerPage />
               </PrivateRoute>
             }
           />
