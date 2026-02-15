@@ -93,11 +93,12 @@ export const getVideoById = async (id: string) => {
   return response.data;
 };
 
-export const uploadVideo = async (formData: FormData) => {
+export const uploadVideo = async (formData: FormData, onUploadProgress?: (progressEvent: any) => void) => {
   const response = await videoApi.post("/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    onUploadProgress,
   });
   return response.data;
 };
