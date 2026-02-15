@@ -83,15 +83,26 @@ const ClassDetails: React.FC = () => {
 
     const handleExtendDuration = async () => {
         if (!classData || !id) return;
+
+        // Basic validation
+        if (extendMonths < 1) {
+            alert("Please enter a valid number of months (minimum 1).");
+            return;
+        }
+
+        if (!window.confirm(`Are you sure you want to extend this class by ${extendMonths} month(s)?`)) return;
+
         try {
             setActionLoading(true);
             await extendClassDuration(id, extendMonths);
-            await fetchClassDetails(); // Refresh data
+            await fetchClassDetails(); // Refresh data to show new duration
             setIsExtendModalOpen(false);
-            setExtendMonths(1); // Reset
+            setExtendMonths(1); // Reset form
+            alert(`Class duration extended by ${extendMonths} month(s) successfully!`);
         } catch (err: any) {
             console.error("Failed to extend duration", err);
-            alert(err.response?.data?.message || "Failed to extend duration");
+            const errorMessage = err.response?.data?.message || "Failed to extend duration";
+            alert(`${errorMessage} (Status: ${err.response?.status})`);
         } finally {
             setActionLoading(false);
         }

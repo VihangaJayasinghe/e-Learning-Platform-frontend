@@ -51,7 +51,9 @@ export const updateClassStatus = async (id: string, status: string) => {
 };
 
 export const extendClassDuration = async (id: string, additionalMonths: number) => {
-  const response = await classApi.patch(`/${id}/extend?additionalMonths=${additionalMonths}`, {});
+  const response = await classApi.post(`/${id}/extend`, {}, {
+    params: { additionalMonths }
+  });
   return response.data;
 };
 
