@@ -236,14 +236,53 @@ export const deleteQuestionFromQuiz = async (quizId: string, questionId: string)
   return response.data;
 };
 
+// Quiz Attempt API instance (Moved up to be available for Results API)
+export const quizAttemptApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/quiz-attempts",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // Quiz Results API
 export const getQuizResults = async (quizId: string) => {
-  const response = await quizApi.get(`/quiz/${quizId}/results`);
+  const response = await quizAttemptApi.get(`/quiz/${quizId}/results`);
   return response.data;
 };
 
 export const getQuizStatistics = async (quizId: string) => {
-  const response = await quizApi.get(`/quiz/${quizId}/statistics`);
+  const response = await quizAttemptApi.get(`/quiz/${quizId}/statistics`);
+  return response.data;
+};
+
+// Quiz Attempt Service Functions
+export const getQuizForStudent = async (quizId: string) => {
+  const response = await quizApi.get(`/${quizId}/attempt`);
+  return response.data;
+};
+
+export const startQuizAttempt = async (quizId: string, studentId: string, studentName: string) => {
+  const response = await quizAttemptApi.post(
+    `/start?quizId=${quizId}&studentId=${studentId}&studentName=${encodeURIComponent(studentName)}`
+  );
+  return response.data;
+};
+
+export const submitQuizAnswer = async (attemptId: string, questionId: string, selectedAnswerIndex: number) => {
+  const response = await quizAttemptApi.post(
+    `/${attemptId}/answer?questionId=${questionId}&selectedAnswerIndex=${selectedAnswerIndex}`
+  );
+  return response.data;
+};
+
+export const completeQuizAttempt = async (attemptId: string) => {
+  const response = await quizAttemptApi.post(`/${attemptId}/complete`);
+  return response.data;
+};
+
+export const getStudentQuizResult = async (quizId: string, studentId: string) => {
+  const response = await quizAttemptApi.get(`/quiz/${quizId}/student/${studentId}/result`);
   return response.data;
 };
 

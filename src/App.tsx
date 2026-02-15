@@ -19,6 +19,7 @@ import QuizEditor from "./pages/QuizEditor";
 import StudentBrowse from "./pages/dashboards/student/StudentBrowse";
 import StudentClassDetails from "./pages/dashboards/student/StudentClassDetails";
 import StudentMonthDetails from "./pages/dashboards/student/StudentMonthDetails";
+import StudentQuizAttempt from "./pages/dashboards/student/StudentQuizAttempt";
 import VideoPlayerPage from "./pages/VideoPlayerPage";
 import Videos from "./pages/Videos";
 
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="classes/:id" element={<ClassDetails />} />
             <Route path="classes/:classId/months/:yearMonth" element={<MonthDetails />} />
             <Route path="quiz/:quizId" element={<QuizEditor />} />
+            <Route path="quiz/attempt/:quizId" element={<StudentQuizAttempt />} />
             <Route path="quiz/:quizId" element={<QuizEditor />} />
             <Route path="videos" element={<Videos />} />
           </Route>
