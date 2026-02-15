@@ -14,6 +14,11 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ClassDetails from "./pages/ClassDetails";
+import SystemAdmin from "./pages/SystemAdmin";
+import UserManagement from "./pages/UserManagement";
+import AllUsers from "./pages/AllUsers";
+import CourseCatalog from "./pages/CourseCatalog";
+import UpdateUser from "./pages/UpdateUser";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -70,6 +75,11 @@ export default function App() {
             <Route index element={<DashboardIndex />} />
             <Route path="classes" element={<Classes />} />
             <Route path="classes/:id" element={<ClassDetails />} />
+            <Route path="system-admin" element={<SystemAdmin />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="user-management/all-users" element={<AllUsers />} />
+            <Route path="course-catalog" element={<CourseCatalog />} />
+            <Route path="user-management/update-user/:username" element={<UpdateUser />} />
           </Route>
           <Route
             path="/profile"

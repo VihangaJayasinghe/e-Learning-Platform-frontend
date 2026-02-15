@@ -35,13 +35,17 @@ const AdminDashboard: React.FC = () => {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-red-500 hover:shadow-2xl hover:shadow-red-100/50 transition-all duration-500 cursor-pointer">
+                <div
+                    onClick={() => navigate("/dashboard/system-admin")}
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-red-500 hover:shadow-2xl hover:shadow-red-100/50 transition-all duration-500 cursor-pointer"
+                >
                     <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-red-600 transition-colors duration-500">
                         <Shield
                             className="text-red-600 group-hover:text-white"
                             size={28}
                         />
                     </div>
+
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                         System Admin
                     </h3>
@@ -50,7 +54,10 @@ const AdminDashboard: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 cursor-pointer">
+                <div
+                    onClick={() => navigate("/dashboard/user-management")}
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 cursor-pointer"
+                >
                     <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-500">
                         <Users className="text-blue-600 group-hover:text-white" size={28} />
                     </div>
@@ -75,7 +82,10 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Common Card: Courses */}
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 cursor-pointer">
+                <div
+                    onClick={() => navigate("/dashboard/course-catalog")}
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 cursor-pointer"
+                >
                     <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors duration-500">
                         <BookOpen
                             className="text-emerald-600 group-hover:text-white"

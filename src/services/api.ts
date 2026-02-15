@@ -24,6 +24,15 @@ export const classApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+// 5. Define the Admin API instance
+export const adminApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/admins",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // 4. Service functions
 export const fetchClassesByInstructor = async (username: string) => {
   const response = await classApi.get(`/instructor/${username}`);
