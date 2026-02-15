@@ -73,7 +73,6 @@ const VideoPlayerPage: React.FC = () => {
             });
 
             player.ready(() => {
-                console.log("Player is ready");
 
                 // Custom Quality Selector Implementation
                 if (player) {
@@ -172,19 +171,16 @@ const VideoPlayerPage: React.FC = () => {
                     };
 
                     qualityLevels.on('addqualitylevel', (event: any) => {
-                        console.log("Quality level added:", event.qualityLevel);
                         handleQualityUpdate();
                     });
 
                     // Force initial update in case levels are already present
-                    console.log("Initial Quality Levels:", qualityLevels.length);
                     if (qualityLevels.length > 0) {
                         handleQualityUpdate();
                     }
 
                     // Also listen to player loadedmetadata being the standard ready state for tracks
                     player.on('loadedmetadata', () => {
-                        console.log("Metadata loaded. Levels:", qualityLevels.length);
                         handleQualityUpdate();
                     });
 
@@ -193,7 +189,6 @@ const VideoPlayerPage: React.FC = () => {
                     const intervalId = setInterval(() => {
                         checks++;
                         if (qualityLevels.length > 0) {
-                            console.log(`Polling found levels at attempt ${checks}:`, qualityLevels.length);
                             handleQualityUpdate();
                         }
 
@@ -227,7 +222,6 @@ const VideoPlayerPage: React.FC = () => {
                     ? 'application/x-mpegURL'
                     : (video.contentType || 'application/x-mpegURL');
 
-                console.log("Setting player source:", hlsUrl);
                 player.src({
                     src: hlsUrl,
                     type: sourceType
