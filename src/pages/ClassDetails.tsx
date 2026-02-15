@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { getClassById, extendClassDuration, updateClassStatus, deleteClass, releaseMonth, unreleaseMonth } from "../services/api";
-import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, CheckCircle, XCircle, Trash2, Lock, Unlock } from "lucide-react";
+import { Loader2, ArrowLeft, Star, Clock, Calendar, DollarSign, User, Edit, Plus, Trash2, Lock, Unlock } from "lucide-react";
 import ClassFormModal from "../components/modals/CreateClassModal";
 import { ClassStatus } from "../types";
 
@@ -45,36 +45,23 @@ const ClassDetails: React.FC = () => {
     const [actionLoading, setActionLoading] = useState(false);
 
 
-    const handlePublish = async () => {
+    const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newStatus = e.target.value;
         if (!classData || !id) return;
-        if (!window.confirm("Are you sure you want to PUBLISH this class? It will be visible to students.")) return;
 
-        try {
-            setActionLoading(true);
-            await updateClassStatus(id, ClassStatus.ACTIVE);
-            await fetchClassDetails();
-            alert("Class published successfully!");
-        } catch (err: any) {
-            console.error("Failed to publish class", err);
-            const errorMessage = err.response?.data?.message || "Failed to publish class";
-            alert(`${errorMessage} (Status: ${err.response?.status})`);
-        } finally {
-            setActionLoading(false);
+        // Confirmation for critical changes (e.g. archiving)
+        if (newStatus === ClassStatus.ARCHIVED) {
+            if (!window.confirm("Are you sure you want to ARCHIVE this class? It will be hidden from everyone.")) return;
         }
-    };
-
-    const handleUnpublish = async () => {
-        if (!classData || !id) return;
-        if (!window.confirm("Are you sure you want to UNPUBLISH this class? It will be hidden from students.")) return;
 
         try {
             setActionLoading(true);
-            await updateClassStatus(id, ClassStatus.DRAFT);
+            await updateClassStatus(id, newStatus);
             await fetchClassDetails();
-            alert("Class unpublished (Draft) successfully!");
+            // alert(`Class status updated to ${newStatus}`);
         } catch (err: any) {
-            console.error("Failed to unpublish class", err);
-            const errorMessage = err.response?.data?.message || "Failed to unpublish class";
+            console.error("Failed to update status", err);
+            const errorMessage = err.response?.data?.message || "Failed to update status";
             alert(`${errorMessage} (Status: ${err.response?.status})`);
         } finally {
             setActionLoading(false);
@@ -198,25 +185,29 @@ const ClassDetails: React.FC = () => {
 
                 {isOwner && (
                     <div className="flex gap-2">
-                        {/* Publish/Unpublish Buttons */}
-                        {classData.status === ClassStatus.DRAFT && (
-                            <button
-                                onClick={handlePublish}
+                        {/* Status Dropdown */}
+                        <div className="relative">
+                            <select
+                                value={classData.status}
+                                onChange={handleStatusChange}
                                 disabled={actionLoading}
-                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                                className={`appearance-none cursor-pointer pl-3 pr-8 py-2 rounded-lg font-bold text-sm shadow-sm border border-transparent focus:ring-2 focus:ring-teal-500 outline-none transition-colors ${classData.status === ClassStatus.ACTIVE ? "bg-teal-100 text-teal-800 hover:bg-teal-200" :
+                                    classData.status === ClassStatus.INACTIVE ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200" :
+                                        classData.status === ClassStatus.ARCHIVED ? "bg-gray-200 text-gray-800 hover:bg-gray-300" :
+                                            "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    }`}
                             >
-                                <CheckCircle size={18} /> Publish
-                            </button>
-                        )}
-                        {classData.status === ClassStatus.ACTIVE && (
-                            <button
-                                onClick={handleUnpublish}
-                                disabled={actionLoading}
-                                className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow-sm"
-                            >
-                                <XCircle size={18} /> Unpublish
-                            </button>
-                        )}
+                                <option value={ClassStatus.DRAFT}>Draft</option>
+                                <option value={ClassStatus.ACTIVE}>Active</option>
+                                <option value={ClassStatus.INACTIVE}>Inactive</option>
+                                <option value={ClassStatus.ARCHIVED}>Archived</option>
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                </svg>
+                            </div>
+                        </div>
                         <button
                             onClick={() => setIsExtendModalOpen(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"

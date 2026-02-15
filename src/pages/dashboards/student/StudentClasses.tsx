@@ -36,7 +36,12 @@ const StudentClasses: React.FC = () => {
         try {
             setLoading(true);
             const data = await getStudentEnrollments();
-            setEnrollments(data);
+            if (Array.isArray(data)) {
+                setEnrollments(data);
+            } else {
+                console.error("Enrollment data is not an array:", data);
+                setEnrollments([]);
+            }
         } catch (error) {
             console.error("Failed to fetch enrollments", error);
         } finally {
@@ -77,6 +82,13 @@ const StudentClasses: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {enrollments.map((enrollment) => {
                         const cls = enrollment.classEnrolled;
+
+                        // Defensive check: if class data is missing, skip rendering this card
+                        if (!cls) {
+                            console.warn("Enrollment found without class data:", enrollment);
+                            return null;
+                        }
+
                         // Handle potential data structure differences
                         const instructorName = cls.instructorUsername || cls.teacher?.username || "Instructor";
                         const startDate = cls.schedule || cls.startMonth || "TBA";
