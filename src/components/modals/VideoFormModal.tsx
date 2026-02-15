@@ -1,13 +1,24 @@
-import React, { useState } from "react";
-import { Loader2, X, Upload } from "lucide-react";
-import { uploadVideo, addVideoToMonth } from "../../services/api";
+import React, { useState, useEffect, useContext } from "react";
+import { Loader2, X, Upload, CheckCircle } from "lucide-react";
+import { uploadVideo, addVideoToMonth, fetchClassesByInstructor, getClassById } from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
 
 interface VideoFormModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
-    classId: string;
+    classId?: string;
+    yearMonth?: string;
+}
+
+interface ClassSummary {
+    id: string;
+    className: string;
+}
+
+interface MonthData {
     yearMonth: string;
+    displayName: string;
 }
 
 const VideoFormModal: React.FC<VideoFormModalProps> = ({
@@ -17,6 +28,7 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
     classId,
     yearMonth,
 }) => {
+    const { user } = useContext(AuthContext); // Need user for fetching classes
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);
@@ -24,12 +36,85 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
 
-    if (!isOpen) return null;
+    // Optional Class Linking State
+    const [shouldAddToClass, setShouldAddToClass] = useState(false);
+    const [classes, setClasses] = useState<ClassSummary[]>([]);
+    const [months, setMonths] = useState<MonthData[]>([]);
+    const [selectedClassId, setSelectedClassId] = useState("");
+    const [selectedYearMonth, setSelectedYearMonth] = useState("");
+    const [loadingClasses, setLoadingClasses] = useState(false);
+    const [loadingMonths, setLoadingMonths] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            // Reset state on open
+            setName("");
+            setDescription("");
+            setFile(null);
+            setUploadProgress(0);
+            setError("");
+            setShouldAddToClass(false);
+            setSelectedClassId("");
+            setSelectedYearMonth("");
+
+            // If classId is not provided, load classes for potential selection
+            if (!classId && user?.username) {
+                loadClasses();
+            }
+        }
+    }, [isOpen, classId, user?.username]);
+
+    // Load months when selectedClassId changes (and we are in generic mode)
+    useEffect(() => {
+        if (!classId && selectedClassId) {
+            loadClassDetails(selectedClassId);
+        } else {
+            setMonths([]);
+            if (!classId) setSelectedYearMonth("");
+        }
+    }, [selectedClassId, classId]);
+
+    const loadClasses = async () => {
+        if (!user?.username) return;
+        try {
+            setLoadingClasses(true);
+            const data = await fetchClassesByInstructor(user.username);
+            const mappedClasses = (Array.isArray(data) ? data : []).map((cls: any) => ({
+                id: String(cls.id),
+                className: cls.className
+            }));
+            setClasses(mappedClasses);
+        } catch (err) {
+            console.error("Failed to load classes", err);
+        } finally {
+            setLoadingClasses(false);
+        }
+    };
+
+    const loadClassDetails = async (cId: string) => {
+        try {
+            setLoadingMonths(true);
+            const data = await getClassById(cId);
+            if (data && Array.isArray(data.months)) {
+                setMonths(data.months);
+            }
+        } catch (err) {
+            console.error("Failed to load class details", err);
+        } finally {
+            setLoadingMonths(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!file || !name || !description) {
             setError("Please fill in all fields and select a file.");
+            return;
+        }
+
+        // Validation for optional class adding
+        if (!classId && shouldAddToClass && (!selectedClassId || !selectedYearMonth)) {
+            setError("Please select a class and month, or uncheck 'Add to Class'.");
             return;
         }
 
@@ -48,16 +133,17 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
                 setUploadProgress(percentCompleted);
             });
 
-            // 2. Add video to the month
-            await addVideoToMonth(classId, yearMonth, video.id);
+            // 2. Add video to the month (if applicable)
+            // Use props if available, otherwise use selected state if enabled
+            const targetClassId = classId || (shouldAddToClass ? selectedClassId : null);
+            const targetYearMonth = yearMonth || (shouldAddToClass ? selectedYearMonth : null);
+
+            if (targetClassId && targetYearMonth) {
+                await addVideoToMonth(targetClassId, targetYearMonth, video.id);
+            }
 
             onSuccess();
             onClose();
-            // Reset form
-            setName("");
-            setDescription("");
-            setFile(null);
-            setUploadProgress(0);
         } catch (err: any) {
             console.error("Failed to add video", err);
             setError(err.response?.data?.message || "Failed to add video. Please try again.");
@@ -66,9 +152,11 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
         }
     };
 
+    if (!isOpen) return null;
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-y-auto max-h-[90vh]">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100">
                     <h3 className="text-xl font-bold text-gray-900">Add New Video</h3>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -156,6 +244,65 @@ const VideoFormModal: React.FC<VideoFormModalProps> = ({
                             </label>
                         </div>
                     </div>
+
+                    {/* Optional Class Linking Section */}
+                    {!classId && (
+                        <div className="pt-2 border-t border-gray-100 mt-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <input
+                                    type="checkbox"
+                                    id="addToClass"
+                                    checked={shouldAddToClass}
+                                    onChange={(e) => setShouldAddToClass(e.target.checked)}
+                                    className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                                />
+                                <label htmlFor="addToClass" className="text-sm font-bold text-gray-700">
+                                    Add to a Class (Optional)
+                                </label>
+                            </div>
+
+                            {shouldAddToClass && (
+                                <div className="space-y-4 animate-fadeIn pl-2 border-l-2 border-gray-100 ml-1">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Class</label>
+                                        {loadingClasses ? (
+                                            <div className="h-10 bg-gray-100 rounded animate-pulse" />
+                                        ) : (
+                                            <select
+                                                value={selectedClassId}
+                                                onChange={(e) => setSelectedClassId(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                            >
+                                                <option value="">Select Class</option>
+                                                {classes.map(c => (
+                                                    <option key={c.id} value={c.id}>{c.className}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Month</label>
+                                        {loadingMonths ? (
+                                            <div className="h-10 bg-gray-100 rounded animate-pulse" />
+                                        ) : (
+                                            <select
+                                                value={selectedYearMonth}
+                                                onChange={(e) => setSelectedYearMonth(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none disabled:bg-gray-50"
+                                                disabled={!selectedClassId}
+                                            >
+                                                <option value="">Select Month</option>
+                                                {months.map(m => (
+                                                    <option key={m.yearMonth} value={m.yearMonth}>{m.displayName}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="pt-4 flex gap-3">
                         <button
