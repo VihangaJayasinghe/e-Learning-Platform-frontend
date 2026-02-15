@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 // Define the User interface to match your backend response
 export interface User {
+  id: string;
   username: string;
   role: string;
   email?: string;

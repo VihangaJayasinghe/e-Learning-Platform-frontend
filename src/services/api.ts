@@ -24,7 +24,21 @@ export const classApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+export const enrollmentApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/enrollments",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 // 4. Service functions
+// --- Class Service ---
+export const getAllClasses = async () => {
+  const response = await classApi.get("");
+  return response.data;
+};
+
 export const fetchClassesByInstructor = async (username: string) => {
   const response = await classApi.get(`/instructor/${username}`);
   return response.data;
@@ -79,7 +93,23 @@ export const getMonthDocuments = async (classId: string, yearMonth: string) => {
   return response.data;
 };
 
-// Video API
+// --- Enrollment Service ---
+export const enrollStudent = async (classId: string) => {
+  const response = await enrollmentApi.post(`/enroll/${classId}`);
+  return response.data;
+};
+
+export const getStudentEnrollments = async () => {
+  const response = await enrollmentApi.get("/my-enrollments");
+  return response.data;
+};
+
+export const checkEnrollment = async (classId: string) => {
+  const response = await enrollmentApi.get(`/check/${classId}`);
+  return response.data;
+};
+
+// --- Video API ---
 export const videoApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/videos",
   headers: {
@@ -196,5 +226,29 @@ export const getQuizResults = async (quizId: string) => {
 
 export const getQuizStatistics = async (quizId: string) => {
   const response = await quizApi.get(`/quiz/${quizId}/statistics`);
+  return response.data;
+};
+
+// Review API
+export const reviewApi: AxiosInstance = axios.create({
+  baseURL: "http://localhost:9090/api/reviews",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
+export const createReview = async (reviewData: any) => {
+  const response = await reviewApi.post("", reviewData);
+  return response.data;
+};
+
+export const getApprovedClassReviews = async (classId: string) => {
+  const response = await reviewApi.get(`/class/${classId}/approved`);
+  return response.data;
+};
+
+export const getClassReviewStats = async (classId: string) => {
+  const response = await reviewApi.get(`/class/${classId}/stats`);
   return response.data;
 };

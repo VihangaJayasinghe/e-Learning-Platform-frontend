@@ -11,8 +11,7 @@ import {
     Users,
     Settings,
     User as UserIcon,
-    LogOut,
-    Menu
+    LogOut
 } from "lucide-react";
 
 interface SidebarItem {
@@ -51,7 +50,7 @@ const Sidebar: React.FC = () => {
     const { user, logout } = context;
     const role = user?.role.toUpperCase();
 
-    const handleNavigation = (label: string, path?: string) => {
+    const handleNavigation = (_label: string, path?: string) => {
         if (path) {
             navigate(path);
         }
