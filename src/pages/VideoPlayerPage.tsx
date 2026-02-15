@@ -6,6 +6,7 @@ import "video.js/dist/video-js.css";
 import "videojs-contrib-quality-levels";
 import { getVideoById } from "../services/api";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import DashboardLayout from "../components/DashboardLayout";
 
 interface VideoData {
     id: string;
@@ -24,7 +25,6 @@ const VideoPlayerPage: React.FC = () => {
     const [video, setVideo] = useState<VideoData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [debugInfo, setDebugInfo] = useState<any>({}); // For on-screen debugging
 
     useEffect(() => {
         const fetchVideo = async () => {
@@ -156,6 +156,9 @@ const VideoPlayerPage: React.FC = () => {
                         // Add icon class to make it visible
                         qualityButton.addClass('vjs-icon-cog');
                         qualityButton.controlText('Quality');
+
+                        // Fix alignment - add custom class
+                        qualityButton.addClass('custom-quality-button');
                     }
 
                     // Re-update items when levels change (e.g., loadedmetadata)
@@ -166,12 +169,6 @@ const VideoPlayerPage: React.FC = () => {
                         if (qualitySelector) {
                             qualitySelector.update();
                         }
-                        // Update debug info state
-                        setDebugInfo((prev: any) => ({
-                            ...prev,
-                            qualityLevels: qualityLevels.length,
-                            levels: qualityLevels
-                        }));
                     };
 
                     qualityLevels.on('addqualitylevel', (event: any) => {
@@ -189,29 +186,6 @@ const VideoPlayerPage: React.FC = () => {
                     player.on('loadedmetadata', () => {
                         console.log("Metadata loaded. Levels:", qualityLevels.length);
                         handleQualityUpdate();
-                        setDebugInfo((prev: any) => ({
-                            ...prev,
-                            tech: player.techName_,
-                            duration: player.duration(),
-                            vhs: (player.tech() as any).vhs ? 'Present' : 'Missing',
-                            hls: (player.tech() as any).hls ? 'Present' : 'Missing',
-                            vhsStats: (player.tech() as any).vhs?.stats || 'N/A'
-                        }));
-
-                        // Try accessing VHS representations directly as fallback logging
-                        const vhs = (player.tech() as any).vhs;
-                        if (vhs) {
-                            console.log("VHS Object found:", vhs);
-                            if (vhs.representations) {
-                                console.log("VHS Representations:", vhs.representations());
-                            }
-                            if (vhs.playlists) {
-                                console.log("VHS Playlists:", vhs.playlists);
-                                if (vhs.playlists.master) {
-                                    console.log("VHS Master Playlist:", vhs.playlists.master);
-                                }
-                            }
-                        }
                     });
 
                     // Polling fallback
@@ -222,12 +196,6 @@ const VideoPlayerPage: React.FC = () => {
                             console.log(`Polling found levels at attempt ${checks}:`, qualityLevels.length);
                             handleQualityUpdate();
                         }
-                        // Update polling status in debug
-                        setDebugInfo((prev: any) => ({
-                            ...prev,
-                            pollingFor: checks,
-                            currentLevels: qualityLevels.length
-                        }));
 
                         if (checks >= 10 && qualityLevels.length === 0) {
                             clearInterval(intervalId);
@@ -265,13 +233,7 @@ const VideoPlayerPage: React.FC = () => {
                     type: sourceType
                 });
 
-                setDebugInfo({
-                    url: hlsUrl,
-                    type: sourceType,
-                    tech: player.techName_ || 'Unknown',
-                    qualityLevels: 0,
-                    status: 'Initialized'
-                });
+
 
             });
         } else {
@@ -337,33 +299,43 @@ const VideoPlayerPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-4xl">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors mb-6"
-                >
-                    <ArrowLeft size={20} /> Back
-                </button>
+        <DashboardLayout>
+            <style>{`
+                /* Custom styles for quality selector alignment */
+                .video-js .custom-quality-button {
+                    margin-top: 0.1em; /* Adjust this value to align with other buttons */
+                }
+                .video-js .vjs-menu-button-popup .vjs-menu {
+                    width: 10em;
+                    left: -3em; 
+                }
+                .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+                    background-color: rgba(43, 51, 63, 0.9); /* Match videojs theme */
+                    max-height: 15em;
+                }
+            `}</style>
+            <div className="flex flex-col h-full bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-6">
+                <div className="w-full max-w-5xl mx-auto">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors mb-6"
+                    >
+                        <ArrowLeft size={20} /> Back to Dashboard
+                    </button>
 
-                <div className="bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div data-vjs-player>
-                        <div ref={videoNode} />
+                    <div className="bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
+                        <div data-vjs-player>
+                            <div ref={videoNode} />
+                        </div>
+                    </div>
+
+                    <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h1 className="text-3xl font-bold mb-3">{video.videoName}</h1>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{video.description}</p>
                     </div>
                 </div>
-
-                <div className="mt-6 text-white">
-                    <h1 className="text-2xl font-bold mb-2">{video.videoName}</h1>
-                    <p className="text-gray-400">{video.description}</p>
-                </div>
-
-                {/* Debug Info Panel */}
-                <div className="mt-8 p-4 bg-gray-800 rounded-lg text-xs font-mono text-green-400 overflow-auto">
-                    <h3 className="font-bold mb-2 text-white">Debug Info</h3>
-                    <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-                </div>
             </div>
-        </div>
+        </DashboardLayout>
     );
 };
 
