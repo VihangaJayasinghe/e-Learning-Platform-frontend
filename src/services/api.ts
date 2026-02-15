@@ -46,12 +46,12 @@ export const updateClass = async (id: string, classData: any) => {
 };
 
 export const updateClassStatus = async (id: string, status: string) => {
-  const response = await classApi.patch(`/${id}/status?status=${status}`);
+  const response = await classApi.patch(`/${id}/status?status=${status}`, {});
   return response.data;
 };
 
 export const extendClassDuration = async (id: string, additionalMonths: number) => {
-  const response = await classApi.patch(`/${id}/extend?additionalMonths=${additionalMonths}`);
+  const response = await classApi.patch(`/${id}/extend?additionalMonths=${additionalMonths}`, {});
   return response.data;
 };
 
@@ -76,6 +76,16 @@ export const getMonthVideos = async (classId: string, yearMonth: string) => {
 
 export const getMonthDocuments = async (classId: string, yearMonth: string) => {
   const response = await classApi.get(`/${classId}/months/${yearMonth}/documents`);
+  return response.data;
+};
+
+export const releaseMonth = async (classId: string, yearMonth: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/release`);
+  return response.data;
+};
+
+export const unreleaseMonth = async (classId: string, yearMonth: string) => {
+  const response = await classApi.post(`/${classId}/months/${yearMonth}/unrelease`);
   return response.data;
 };
 
