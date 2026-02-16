@@ -42,6 +42,7 @@ const ClassDetails: React.FC = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [extendMonths, setExtendMonths] = useState(1);
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
+    const [secretKey, setSecretKey] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
 
 
@@ -98,10 +99,14 @@ const ClassDetails: React.FC = () => {
     const handleDeleteClass = async () => {
         if (!classData || !id) return;
         if (deleteConfirmation !== classData.className) return;
+        if (!secretKey) {
+            alert("Please enter the secret key.");
+            return;
+        }
 
         try {
             setActionLoading(true);
-            await deleteClass(id);
+            await deleteClass(id, secretKey);
             navigate('/dashboard/classes');
         } catch (err: any) {
             console.error("Failed to delete class", err);
@@ -434,12 +439,19 @@ const ClassDetails: React.FC = () => {
                                 Type <span className="font-bold select-all">{classData?.className}</span> to confirm.
                             </p>
 
-                            <div className="mb-6">
+                            <div className="mb-6 space-y-4">
                                 <input
                                     type="text"
                                     value={deleteConfirmation}
                                     onChange={(e) => setDeleteConfirmation(e.target.value)}
                                     placeholder="Type class name"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                />
+                                <input
+                                    type="password"
+                                    value={secretKey}
+                                    onChange={(e) => setSecretKey(e.target.value)}
+                                    placeholder="Enter Secret Key"
                                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
                                 />
                             </div>
@@ -449,6 +461,7 @@ const ClassDetails: React.FC = () => {
                                     onClick={() => {
                                         setIsDeleteModalOpen(false);
                                         setDeleteConfirmation("");
+                                        setSecretKey("");
                                     }}
                                     className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
                                 >
@@ -456,7 +469,7 @@ const ClassDetails: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={handleDeleteClass}
-                                    disabled={actionLoading || deleteConfirmation !== classData?.className}
+                                    disabled={actionLoading || deleteConfirmation !== classData?.className || !secretKey}
                                     className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete"}

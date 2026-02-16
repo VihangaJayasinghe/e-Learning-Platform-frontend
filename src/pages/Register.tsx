@@ -9,8 +9,6 @@ import {
   Check,
   ShieldCheck,
   ShieldAlert,
-  Smartphone,
-  Fingerprint,
   X,
 } from "lucide-react";
 

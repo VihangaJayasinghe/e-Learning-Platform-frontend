@@ -95,7 +95,7 @@ const VideoPlayerPage: React.FC = () => {
                         }
 
                         handleClick() {
-                            const qualityLevels = (this.player_ as any).qualityLevels();
+                            const qualityLevels = ((this as any).player() as any).qualityLevels();
                             super.handleClick();
 
                             if (this.level === 'auto') {
@@ -114,11 +114,11 @@ const VideoPlayerPage: React.FC = () => {
 
                     class QualitySelector extends MenuButton {
                         createItems() {
-                            const qualityLevels = (this.player_ as any).qualityLevels();
+                            const qualityLevels = ((this as any).player() as any).qualityLevels();
                             const items = [];
 
                             // Auto Item
-                            items.push(new QualityMenuItem(this.player_, {
+                            items.push(new QualityMenuItem((this as any).player(), {
                                 label: 'Auto',
                                 level: 'auto',
                                 selected: true // Default to auto
@@ -128,7 +128,7 @@ const VideoPlayerPage: React.FC = () => {
                             for (let i = 0; i < qualityLevels.length; i++) {
                                 const level = qualityLevels[i];
                                 const label = level.height ? `${level.height}p` : `Level ${i}`;
-                                items.push(new QualityMenuItem(this.player_, {
+                                items.push(new QualityMenuItem((this as any).player(), {
                                     label: label,
                                     level: i,
                                     selected: false
