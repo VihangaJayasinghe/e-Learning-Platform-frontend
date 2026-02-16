@@ -257,6 +257,11 @@ export const getTeacherPayments = async () => {
   return response.data;
 };
 
+export const getTeacherAnalytics = async () => {
+  const response = await teacherApi.get('/analytics');
+  return response.data;
+};
+
 export const createQuiz = async (quizData: any) => {
   const response = await quizApi.post("", quizData);
   return response.data;
