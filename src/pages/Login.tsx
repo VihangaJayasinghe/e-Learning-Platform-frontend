@@ -13,19 +13,21 @@ import {
   EyeOff,
 } from "lucide-react";
 
+// Login component for user authentication
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  // Accessing context safely
+  // Access the AuthContext to use the login function and user state
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { login } = authContext;
 
+  // Handle form submission for login
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -60,7 +62,7 @@ const Login: React.FC = () => {
     }
   };
 
-  // Helper for input changes to keep code clean
+  // Handle input changes for username and password fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

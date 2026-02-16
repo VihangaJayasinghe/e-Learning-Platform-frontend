@@ -36,6 +36,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
+  // On component mount, check for existing user data in localStorage to maintain login state
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
