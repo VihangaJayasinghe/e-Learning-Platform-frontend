@@ -202,8 +202,8 @@ const Login: React.FC = () => {
 
           <button
             onClick={() =>
-              (window.location.href =
-                "http://localhost:9090/oauth2/authorization/google")
+            (window.location.href =
+              "https://e-learning-platform-backend-production.up.railway.app/oauth2/authorization/google")
             }
             className="w-full bg-white/80 border border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl hover:bg-white hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm"
           >

@@ -2,7 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 
 // 1. Define the base API instance with a Type
 const api: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/users",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/users",
   // 2. Set default headers and withCredentials for authentication
   headers: {
     "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export default api;
 
 // 3. Define the Classes API instance
 export const classApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/classes",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/classes",
   headers: {
     "Content-Type": "application/json",
   },
@@ -23,7 +23,7 @@ export const classApi: AxiosInstance = axios.create({
 });
 
 export const enrollmentApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/enrollments",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/enrollments",
   headers: {
     "Content-Type": "application/json",
   },
@@ -147,7 +147,7 @@ export const checkEnrollment = async (classId: string) => {
 
 // --- Video API ---
 export const videoApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/videos",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/videos",
   headers: {
     "Content-Type": "application/json",
   },
@@ -183,7 +183,7 @@ export const getVideosByUser = async (username: string) => {
 
 // Document API
 export const documentApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/documents", // Check controller path
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/documents", // Check controller path
   headers: {
     "Content-Type": "application/json",
   },
@@ -232,7 +232,7 @@ export const removeDocumentFromMonth = async (
 
 // Quiz API
 export const quizApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/quizzes",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/quizzes",
   headers: {
     "Content-Type": "application/json",
   },
@@ -249,7 +249,7 @@ export const getQuizzesByClassAndMonth = async (
 
 // --- Payments ---
 export const paymentApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/payments",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/payments",
   headers: {
     "Content-Type": "application/json",
   },
@@ -294,7 +294,7 @@ export const getMyPayments = async () => {
 // Actually, looking at the doc: "Teacher Analytics API Endpoint: GET /api/teachers/payments".
 // This is likely a different base URL than /api/payments.
 export const teacherApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/teachers",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/teachers",
   headers: {
     "Content-Type": "application/json",
   },
@@ -355,7 +355,7 @@ export const deleteQuestionFromQuiz = async (
 
 // Quiz Attempt API instance (Moved up to be available for Results API)
 export const quizAttemptApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/quiz-attempts",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/quiz-attempts",
   headers: {
     "Content-Type": "application/json",
   },
@@ -418,7 +418,7 @@ export const getStudentQuizResult = async (
 
 // Review API
 export const reviewApi: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9090/api/reviews",
+  baseURL: "https://e-learning-platform-backend-production.up.railway.app/api/reviews",
   headers: {
     "Content-Type": "application/json",
   },
