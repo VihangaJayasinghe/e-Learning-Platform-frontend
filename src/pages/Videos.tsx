@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { getVideosByUser } from "../services/api";
-import { Loader2, Play, Video as VideoIcon } from "lucide-react";
+import { Loader2, Play, Video as VideoIcon, Plus, Upload, Check, Search, Film } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AddToClassModal from "../components/modals/AddToClassModal";
 import VideoFormModal from "../components/modals/VideoFormModal";
-import { Check, Plus, Upload } from "lucide-react";
 
 interface VideoData {
     id: string;
@@ -13,7 +12,7 @@ interface VideoData {
     description: string;
     firebaseUrl: string;
     contentType: string;
-    thumbnail?: string; // Assuming maybe in future?
+    thumbnail?: string;
 }
 
 const Videos: React.FC = () => {
@@ -27,6 +26,7 @@ const Videos: React.FC = () => {
     const [selectedVideoIds, setSelectedVideoIds] = useState<string[]>([]);
     const [isAddToClassModalOpen, setIsAddToClassModalOpen] = useState(false);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     // Derived state from context
     const user = context?.user;
@@ -52,7 +52,7 @@ const Videos: React.FC = () => {
     const refreshVideos = async () => {
         if (!user?.username) return;
         try {
-            setLoading(true); // Optional: show skeleton/loading
+            setLoading(true);
             const data = await getVideosByUser(user.username);
             setVideos(data);
         } catch (err) {
@@ -61,14 +61,6 @@ const Videos: React.FC = () => {
             setLoading(false);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-96 text-teal-600">
-                <Loader2 className="animate-spin" size={48} />
-            </div>
-        );
-    }
 
     const toggleVideoSelection = (videoId: string) => {
         setSelectedVideoIds(prev =>
@@ -82,39 +74,59 @@ const Videos: React.FC = () => {
         setSelectedVideoIds([]);
     };
 
+    const filteredVideos = videos.filter(video =>
+        video.videoName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        video.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen text-teal-600 bg-white">
+                <Loader2 className="animate-spin" size={48} />
+            </div>
+        );
+    }
+
     if (error) {
         return (
-            <div className="text-center p-8 text-red-500 bg-red-50 rounded-lg">
-                <p>{error}</p>
+            <div className="text-center p-8 text-red-500 bg-red-50 rounded-2xl m-6 border border-red-100">
+                <p className="font-medium">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <VideoIcon className="text-teal-600" /> My Videos
-                </h1>
+        <div className="p-8 font-sans bg-white min-h-screen text-gray-900">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                <div>
+                    <h1 className="text-4xl font-black text-teal-900 tracking-tight flex items-center gap-4 mb-2">
+                        <div className="p-3 bg-teal-100 rounded-2xl text-teal-600 shadow-sm">
+                            <Film size={32} strokeWidth={2.5} />
+                        </div>
+                        Video Library
+                    </h1>
+                    <p className="text-gray-500 font-medium ml-16">Manage and organize your course videos.</p>
+                </div>
 
-                <div className="flex items-center gap-3">
-                    {selectedVideoIds.length === 0 && (
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    {selectedVideoIds.length === 0 ? (
                         <button
                             onClick={() => setIsUploadModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
+                            className="flex items-center gap-2 px-6 py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-900 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
                         >
-                            <Upload size={18} /> Upload Video
+                            <Upload size={20} strokeWidth={2.5} />
+                            <span>Upload Video</span>
                         </button>
-                    )}
-
-                    {selectedVideoIds.length > 0 && (
-                        <div className="flex items-center gap-3 animate-fadeIn">
-                            <span className="text-sm font-semibold text-gray-500">
+                    ) : (
+                        <div className="flex items-center gap-3 bg-teal-50 p-2 pr-2 pl-4 rounded-xl border border-teal-100 animate-fadeIn">
+                            <span className="text-sm font-bold text-teal-800 whitespace-nowrap">
                                 {selectedVideoIds.length} selected
                             </span>
+                            <div className="h-6 w-px bg-teal-200 mx-1"></div>
                             <button
                                 onClick={handleClearSelection}
-                                className="px-3 py-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="px-3 py-1.5 text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors"
                             >
                                 Cancel
                             </button>
@@ -122,40 +134,54 @@ const Videos: React.FC = () => {
                                 onClick={() => setIsAddToClassModalOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
                             >
-                                <Plus size={18} /> Add to Class
-                            </button>
-                            <button
-                                onClick={() => setIsAddToClassModalOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
-                            >
-                                <Plus size={18} /> Add to Class
+                                <Plus size={18} strokeWidth={2.5} /> Add to Class
                             </button>
                         </div>
                     )}
                 </div>
             </div>
 
+            {/* Search Bar */}
+            <div className="relative mb-8 max-w-lg">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    placeholder="Search videos..."
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 sm:text-sm shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* Content Area */}
             {videos.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <VideoIcon className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900">No videos yet</h3>
-                    <h3 className="text-lg font-medium text-gray-900">No videos yet</h3>
-                    <p className="text-gray-500 mt-1 mb-4">Videos you upload will appear here.</p>
+                <div className="text-center py-32 bg-gray-50 rounded-[30px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center group hover:border-teal-200 transition-colors">
+                    <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <VideoIcon className="h-10 w-10 text-gray-300 group-hover:text-teal-500 transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">No videos uploaded yet</h3>
+                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">Upload your first video to start building your course library.</p>
                     <button
                         onClick={() => setIsUploadModalOpen(true)}
-                        className="px-6 py-2 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
+                        className="px-8 py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-900/10"
                     >
-                        Upload your first video
+                        Upload Video
                     </button>
                 </div>
+            ) : filteredVideos.length === 0 ? (
+                <div className="text-center py-20">
+                    <p className="text-gray-500 font-medium">No videos match your search.</p>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {videos.map((video) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {filteredVideos.map((video) => (
                         <div
                             key={video.id}
-                            className={`group bg-white rounded-xl shadow-sm border transition-all cursor-pointer flex flex-col h-full relative ${selectedVideoIds.includes(video.id)
-                                ? 'border-teal-500 ring-2 ring-teal-500 ring-offset-2'
-                                : 'border-gray-100 hover:shadow-md'
+                            className={`group bg-white rounded-[24px] border transition-all duration-300 cursor-pointer flex flex-col h-full relative overflow-hidden ${selectedVideoIds.includes(video.id)
+                                ? 'border-teal-500 ring-2 ring-teal-500 ring-offset-2 shadow-xl shadow-teal-900/10'
+                                : 'border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 hover:border-teal-100'
                                 }`}
                             onClick={() => {
                                 if (selectedVideoIds.length > 0) {
@@ -165,39 +191,57 @@ const Videos: React.FC = () => {
                                 }
                             }}
                         >
-                            {/* Checkbox Overlay */}
+                            {/* Selection Checkbox */}
                             <div
-                                className="absolute top-3 left-3 z-10"
+                                className="absolute top-4 left-4 z-20"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     toggleVideoSelection(video.id);
                                 }}
                             >
-                                <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${selectedVideoIds.includes(video.id)
-                                    ? 'bg-teal-500 border-teal-500'
-                                    : 'bg-white/80 border-gray-300 backdrop-blur-sm hover:border-teal-500'
+                                <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-200 ${selectedVideoIds.includes(video.id)
+                                    ? 'bg-teal-500 border-teal-500 shadow-md transform scale-100'
+                                    : 'bg-white/90 border-gray-200 backdrop-blur-md hover:border-teal-400 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
                                     }`}>
-                                    {selectedVideoIds.includes(video.id) && <Check size={14} className="text-white" />}
+                                    {selectedVideoIds.includes(video.id) && <Check size={16} className="text-white" strokeWidth={3} />}
                                 </div>
                             </div>
 
 
-                            {/* Thumbnail Placeholder */}
+                            {/* Thumbnail */}
                             <div className="aspect-video bg-gray-900 relative flex items-center justify-center overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
-                                <Play className="text-white opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 drop-shadow-lg" size={48} fill="white" />
-                                <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded font-medium backdrop-blur-sm">
+                                {/* Gradient Background / Placeholder */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-80" />
+
+                                {/* Decorative elements */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+
+                                {/* Play Button Overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 backdrop-blur-[2px]">
+                                    <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                        <Play className="text-white ml-1" size={24} fill="white" />
+                                    </div>
+                                </div>
+
+                                <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-md uppercase tracking-wider border border-white/10">
                                     Video
-                                </span>
+                                </div>
                             </div>
 
-                            <div className="p-4 flex flex-col flex-1">
-                                <h3 className="font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-teal-600 transition-colors">
+                            {/* Content */}
+                            <div className="p-5 flex flex-col flex-1">
+                                <h3 className="font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-teal-700 transition-colors leading-snug">
                                     {video.videoName}
                                 </h3>
-                                <p className="text-sm text-gray-500 line-clamp-3 mb-4 flex-1">
-                                    {video.description}
+                                <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
+                                    {video.description || "No description provided."}
                                 </p>
+
+                                <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400 font-medium">
+                                    <span className="bg-gray-100 px-2 py-1 rounded text-gray-500 uppercase tracking-wide text-[10px]">MP4</span>
+                                    {/* Placeholder for duration or date if available in future */}
+                                    <span>Ready</span>
+                                </div>
                             </div>
                         </div>
                     ))}

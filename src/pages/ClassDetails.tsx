@@ -174,27 +174,31 @@ const ClassDetails: React.FC = () => {
     const isOwner = user?.username === classData.teacher.username;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="flex justify-between items-center mb-6">
+        <div className="min-h-screen bg-white p-8 font-sans text-gray-900">
+            {/* Top Bar */}
+            <div className="flex justify-between items-center mb-10">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors"
+                    className="flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors group font-medium"
                 >
-                    <ArrowLeft size={20} /> Back to Classes
+                    <div className="p-2 rounded-full bg-gray-100 group-hover:bg-teal-50 transition-colors">
+                        <ArrowLeft size={20} />
+                    </div>
+                    Back to Classes
                 </button>
 
                 {isOwner && (
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-3">
                         {/* Status Dropdown */}
                         <div className="relative">
                             <select
                                 value={classData.status}
                                 onChange={handleStatusChange}
                                 disabled={actionLoading}
-                                className={`appearance-none cursor-pointer pl-3 pr-8 py-2 rounded-lg font-bold text-sm shadow-sm border border-transparent focus:ring-2 focus:ring-teal-500 outline-none transition-colors ${classData.status === ClassStatus.ACTIVE ? "bg-teal-100 text-teal-800 hover:bg-teal-200" :
-                                    classData.status === ClassStatus.INACTIVE ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200" :
-                                        classData.status === ClassStatus.ARCHIVED ? "bg-gray-200 text-gray-800 hover:bg-gray-300" :
-                                            "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                                className={`appearance-none cursor-pointer pl-4 pr-10 py-2.5 rounded-xl font-bold text-sm shadow-sm border border-transparent focus:ring-2 focus:ring-teal-500 outline-none transition-all ${classData.status === ClassStatus.ACTIVE ? "bg-teal-50 text-teal-700 border-teal-100 hover:bg-teal-100" :
+                                    classData.status === ClassStatus.INACTIVE ? "bg-yellow-50 text-yellow-700 border-yellow-100 hover:bg-yellow-100" :
+                                        classData.status === ClassStatus.ARCHIVED ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200" :
+                                            "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
                                     }`}
                             >
                                 <option value={ClassStatus.DRAFT}>Draft</option>
@@ -202,122 +206,147 @@ const ClassDetails: React.FC = () => {
                                 <option value={ClassStatus.INACTIVE}>Inactive</option>
                                 <option value={ClassStatus.ARCHIVED}>Archived</option>
                             </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-current opacity-70">
                                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                                 </svg>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setIsExtendModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
-                        >
-                            <Plus size={18} /> Extend
-                        </button>
-                        <button
-                            onClick={() => setIsEditModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
-                        >
-                            <Edit size={18} /> Edit Class
-                        </button>
+
+                        {/* Delete Button */}
                         <button
                             onClick={() => setIsDeleteModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                            className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                            title="Delete Class"
                         >
-                            <Trash2 size={18} /> Delete
+                            <Trash2 size={20} />
                         </button>
                     </div>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-10">
                     {/* Header Card */}
-                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                        <div className="flex justify-between items-start mb-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${classData.status === ClassStatus.ACTIVE ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {classData.status}
-                            </span>
-                            <div className="flex items-center gap-1 text-yellow-500">
-                                <Star fill="currentColor" size={20} />
-                                <span className="font-bold text-lg">{classData.averageRating.toFixed(1)}</span>
-                                <span className="text-gray-400 text-sm">({classData.totalReviews} reviews)</span>
+                    <div>
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="flex items-center gap-3">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${classData.status === ClassStatus.ACTIVE ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'
+                                    }`}>
+                                    {classData.status}
+                                </span>
+                                <div className="flex items-center gap-1 text-yellow-500 bg-yellow-50 px-2 py-1 rounded-full">
+                                    <Star fill="currentColor" size={14} />
+                                    <span className="font-bold text-sm">{classData.averageRating.toFixed(1)}</span>
+                                    <span className="text-yellow-600/60 text-xs">({classData.totalReviews})</span>
+                                </div>
                             </div>
                         </div>
 
-                        <h1 className="text-4xl font-bold text-gray-900 mb-4">{classData.className}</h1>
-                        <p className="text-gray-600 text-lg leading-relaxed">{classData.description}</p>
+                        <div className="flex items-start gap-4 mb-6">
+                            <h1 className="text-5xl font-black text-gray-900 tracking-tight leading-tight">
+                                {classData.className}
+                            </h1>
+                            {isOwner && (
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    className="mt-2 p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors"
+                                    title="Edit Class Details"
+                                >
+                                    <Edit size={24} />
+                                </button>
+                            )}
+                        </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-teal-50 text-teal-600 rounded-lg">
-                                    <Clock size={24} />
+                        <p className="text-gray-600 text-lg leading-relaxed mb-10 max-w-2xl">
+                            {classData.description}
+                        </p>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                            <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                                <div className="p-3 bg-teal-100 text-teal-700 rounded-xl">
+                                    <Clock size={24} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Duration</p>
-                                    <p className="font-bold text-gray-900">{classData.durationMonths} Months</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Duration</p>
+                                    <p className="font-bold text-gray-900 text-lg">{classData.durationMonths} Months</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-teal-50 text-teal-600 rounded-lg">
-                                    <Calendar size={24} />
+                            <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                                <div className="p-3 bg-blue-100 text-blue-700 rounded-xl">
+                                    <Calendar size={24} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Start Date</p>
-                                    <p className="font-bold text-gray-900">{classData.startMonth}</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Start Date</p>
+                                    <p className="font-bold text-gray-900 text-lg">{classData.startMonth}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-teal-50 text-teal-600 rounded-lg">
-                                    <DollarSign size={24} />
+                            <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                                <div className="p-3 bg-green-100 text-green-700 rounded-xl">
+                                    <DollarSign size={24} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Monthly Price</p>
-                                    <p className="font-bold text-gray-900">${classData.monthlyPrice}</p>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Monthly Price</p>
+                                    <p className="font-bold text-gray-900 text-lg">${classData.monthlyPrice}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Syllabus */}
-                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Syllabus</h2>
+                    <div>
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                                Syllabus
+                                <span className="text-gray-300 text-lg font-normal">/ Timeline</span>
+                            </h2>
+                            {isOwner && (
+                                <button
+                                    onClick={() => setIsExtendModalOpen(true)}
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                    <Plus size={18} />
+                                    <span>Extend Course</span>
+                                </button>
+                            )}
+                        </div>
+
                         <div className="space-y-4">
                             {classData.months.map((month, index) => (
                                 <div
                                     key={index}
                                     onClick={() => navigate(`/dashboard/classes/${id}/months/${month.yearMonth}`)}
-                                    className="border border-gray-200 rounded-xl p-4 hover:border-teal-500 transition-colors cursor-pointer group"
+                                    className="bg-white border border-gray-200 rounded-[24px] p-5 hover:border-teal-500 hover:shadow-xl hover:shadow-teal-900/5 transition-all cursor-pointer group relative overflow-hidden"
                                 >
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
+                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gray-100 group-hover:bg-teal-500 transition-colors"></div>
+                                    <div className="flex justify-between items-center pl-4">
+                                        <div className="flex items-center gap-5">
+                                            <div className="h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center font-black text-lg text-gray-400 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors">
                                                 {index + 1}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-gray-900">{month.displayName}</h4>
-                                                <p className="text-sm text-gray-500">Year-Month: {month.yearMonth}</p>
+                                                <h4 className="font-bold text-gray-900 text-lg group-hover:text-teal-700 transition-colors">{month.displayName}</h4>
+                                                <p className="text-sm text-gray-500 font-medium">Year-Month: <span className="font-mono text-gray-600">{month.yearMonth}</span></p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-4">
+                                            <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${month.released ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                {month.released ? 'Published' : 'Locked'}
+                                            </span>
                                             {isOwner && (
                                                 <button
                                                     onClick={(e) => handleToggleMonthStatus(month.yearMonth, month.released, e)}
-                                                    className={`p-2 rounded-full transition-colors ${month.released
-                                                        ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                                    className={`p-3 rounded-xl transition-all ${month.released
+                                                        ? 'bg-green-50 text-green-600 hover:bg-green-100'
+                                                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
                                                         }`}
                                                     title={month.released ? "Unrelease Month" : "Release Month"}
                                                 >
-                                                    {month.released ? <Unlock size={16} /> : <Lock size={16} />}
+                                                    {month.released ? <Unlock size={18} /> : <Lock size={18} />}
                                                 </button>
                                             )}
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${month.released ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                {month.released ? 'Released' : 'Locked'}
-                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -329,37 +358,37 @@ const ClassDetails: React.FC = () => {
                 {/* Sidebar */}
                 <div className="space-y-8">
                     {/* Instructor Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-8">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
+                    <div className="bg-gray-50 rounded-[30px] p-8">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center text-gray-300 shadow-sm">
                                 <User size={32} />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Instructor</p>
-                                <h3 className="text-xl font-bold text-gray-900">{classData.teacher.username}</h3>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Instructor</p>
+                                <h3 className="text-xl font-black text-gray-900">{classData.teacher.username}</h3>
                             </div>
                         </div>
 
-                        <div className="space-y-4 mb-6">
+                        <div className="space-y-6 mb-8">
                             <div>
-                                <p className="text-sm font-bold text-gray-700">Qualification</p>
-                                <p className="text-gray-600">{classData.teacher.qualification || "Not specified"}</p>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Qualification</p>
+                                <p className="text-gray-900 font-semibold">{classData.teacher.qualification || "Not specified"}</p>
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-700">Experience</p>
-                                <p className="text-gray-600">{classData.teacher.yearsOfExperience} years</p>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Experience</p>
+                                <p className="text-gray-900 font-semibold">{classData.teacher.yearsOfExperience} years</p>
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-700">Expertise</p>
-                                <p className="text-gray-600">{classData.teacher.subjectExpertise}</p>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Expertise</p>
+                                <p className="text-gray-900 font-semibold">{classData.teacher.subjectExpertise}</p>
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-700">Bio</p>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">About</p>
                                 <p className="text-gray-600 text-sm leading-relaxed">{classData.teacher.bio}</p>
                             </div>
                         </div>
 
-                        <button className="w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors">
+                        <button className="w-full bg-white border border-gray-200 text-gray-900 py-3 rounded-xl font-bold hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm">
                             Contact Instructor
                         </button>
                     </div>
@@ -382,36 +411,46 @@ const ClassDetails: React.FC = () => {
             {/* Extend Modal */}
             {
                 isExtendModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                        <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Extend Class Duration</h3>
-                            <p className="text-gray-500 mb-6">Add more months to the course content.</p>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                        <div className="bg-white rounded-[32px] w-full max-w-sm shadow-2xl p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-2 bg-indigo-500"></div>
+                            <h3 className="text-2xl font-black text-gray-900 mb-2">Extend Class</h3>
+                            <p className="text-gray-500 mb-8 leading-relaxed">Add more months to the course content duration.</p>
 
-                            <div className="mb-6">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                            <div className="mb-8">
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
                                     Additional Months
                                 </label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="12"
-                                    value={extendMonths}
-                                    onChange={(e) => setExtendMonths(parseInt(e.target.value) || 1)}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
-                                />
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => setExtendMonths(Math.max(1, extendMonths - 1))}
+                                        className="h-12 w-12 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
+                                    >
+                                        -
+                                    </button>
+                                    <div className="flex-1 text-center font-black text-2xl text-indigo-600">
+                                        {extendMonths}
+                                    </div>
+                                    <button
+                                        onClick={() => setExtendMonths(extendMonths + 1)}
+                                        className="h-12 w-12 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 <button
                                     onClick={() => setIsExtendModalOpen(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleExtendDuration}
                                     disabled={actionLoading}
-                                    className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 flex items-center justify-center"
+                                    className="flex-1 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 flex items-center justify-center transition-colors shadow-lg shadow-indigo-200"
                                 >
                                     {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Extend"}
                                 </button>
@@ -424,42 +463,46 @@ const ClassDetails: React.FC = () => {
             {/* Delete Confirmation Modal */}
             {
                 isDeleteModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                        <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Class</h3>
-                            <p className="text-gray-500 mb-4">
-                                Are you sure you want to delete this class? This action cannot be undone.
-                            </p>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Type <span className="font-bold select-all">{classData?.className}</span> to confirm.
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-red-900/40 backdrop-blur-md">
+                        <div className="bg-white rounded-[32px] w-full max-w-md shadow-2xl p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
+                            <div className="text-red-500 mb-4">
+                                <Trash2 size={40} />
+                            </div>
+                            <h3 className="text-2xl font-black text-gray-900 mb-2">Delete Class?</h3>
+                            <p className="text-gray-500 mb-6 leading-relaxed">
+                                This action is permanent and cannot be undone. All data associated with this class will be lost.
                             </p>
 
-                            <div className="mb-6">
+                            <div className="bg-red-50 p-4 rounded-xl mb-6 border border-red-100">
+                                <p className="text-sm text-red-800 mb-2 font-medium">
+                                    Type <span className="font-black select-all">{classData?.className}</span> to confirm.
+                                </p>
                                 <input
                                     type="text"
                                     value={deleteConfirmation}
                                     onChange={(e) => setDeleteConfirmation(e.target.value)}
                                     placeholder="Type class name"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                    className="w-full px-4 py-3 bg-white border border-red-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-medium placeholder-red-200"
                                 />
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 <button
                                     onClick={() => {
                                         setIsDeleteModalOpen(false);
                                         setDeleteConfirmation("");
                                     }}
-                                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50"
+                                    className="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleDeleteClass}
                                     disabled={actionLoading || deleteConfirmation !== classData?.className}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-200 transition-colors"
                                 >
-                                    {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete"}
+                                    {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Delete Forever"}
                                 </button>
                             </div>
                         </div>

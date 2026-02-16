@@ -91,43 +91,51 @@ const TeacherClasses: React.FC = () => {
     }
 
     return (
-        <div className="bg-white text-black min-h-full">
-            <header className="flex justify-between items-center mb-8">
+        <div className="bg-white min-h-screen p-8 font-sans">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-gray-100 pb-8">
                 <div>
-                    <h2 className="text-3xl font-bold">My Classes</h2>
-                    <p className="text-gray-500 mt-1">Manage your courses and student enrollments</p>
+                    <h1 className="text-4xl font-black text-teal-900 tracking-tight mb-2">My Classes</h1>
+                    <p className="text-gray-500 font-medium">Manage your courses, track student progress, and update content.</p>
                 </div>
                 <button
                     onClick={handleCreateClick}
-                    className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-teal-100"
+                    className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-teal-500/20 hover:shadow-2xl hover:shadow-teal-500/30 flex items-center gap-2 active:scale-95"
                 >
-                    + Create New Class
+                    <span className="text-xl leading-none mb-1">+</span> Create New Class
                 </button>
             </header>
 
             {classes.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                    <p className="text-gray-500 text-lg">You haven't created any classes yet.</p>
+                <div className="flex flex-col items-center justify-center py-24 bg-gray-50 rounded-[30px] border-2 border-dashed border-gray-200">
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
+                        <span className="text-4xl">📚</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">No classes created yet</h3>
+                    <p className="text-gray-500 mb-8 max-w-sm text-center">Start your teaching journey by creating your first class today.</p>
                     <button
                         onClick={handleCreateClick}
-                        className="mt-4 text-teal-600 font-bold hover:underline"
+                        className="text-teal-600 font-bold hover:text-teal-700 hover:underline transition-all"
                     >
                         Create your first class
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                     {classes.map((cls) => (
-                        <div key={cls.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:shadow-gray-100 transition-all duration-300 group">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="z-10" onClick={(e) => e.stopPropagation()}>
+                        <div key={cls.id} className="group bg-white rounded-[24px] border border-gray-200 hover:border-teal-200 hover:shadow-2xl hover:shadow-teal-900/5 transition-all duration-300 flex flex-col overflow-hidden relative">
+                            {/* Decorative Header */}
+                            <div className="h-32 bg-gray-50 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
+                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-50 rounded-full blur-2xl opacity-50 translate-y-1/2 -translate-x-1/2"></div>
+
+                                <div className="absolute top-6 right-6 z-10" onClick={(e) => e.stopPropagation()}>
                                     <select
                                         value={cls.status || 'DRAFT'}
                                         onChange={(e) => handleStatusChange(cls.id, e.target.value, e)}
-                                        className={`px-2 py-1 text-xs font-bold rounded uppercase tracking-wider border-none focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer ${cls.status === 'ACTIVE' ? "bg-teal-100 text-teal-700" :
-                                            cls.status === 'INACTIVE' ? "bg-yellow-100 text-yellow-700" :
-                                                cls.status === 'ARCHIVED' ? "bg-gray-200 text-gray-700" :
-                                                    "bg-gray-100 text-gray-600"
+                                        className={`appearance-none px-4 py-1.5 text-xs font-black rounded-full uppercase tracking-widest border-none focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer shadow-sm transition-all ${cls.status === 'ACTIVE' ? "bg-teal-500 text-white" :
+                                                cls.status === 'INACTIVE' ? "bg-yellow-400 text-yellow-900" :
+                                                    cls.status === 'ARCHIVED' ? "bg-gray-800 text-gray-200" :
+                                                        "bg-white text-gray-500"
                                             }`}
                                     >
                                         <option value="DRAFT">Draft</option>
@@ -136,45 +144,50 @@ const TeacherClasses: React.FC = () => {
                                         <option value="ARCHIVED">Archived</option>
                                     </select>
                                 </div>
-                                <span className="text-xs text-gray-400 font-mono">ID: {cls.id}</span>
                             </div>
 
-                            <h3 className="text-xl font-bold mb-2 group-hover:text-teal-600 transition-colors line-clamp-1" title={cls.className}>
-                                {cls.className}
-                            </h3>
-
-                            <p className="text-gray-500 text-sm mb-4 line-clamp-2 h-10">
-                                {cls.description || "No description provided."}
-                            </p>
-
-                            <div className="flex flex-col gap-1 mb-6 text-sm text-gray-600">
-                                <div className="flex justify-between">
-                                    <span>Start:</span>
-                                    <span className="font-medium">{cls.startMonth}</span>
+                            <div className="p-8 -mt-12 relative z-10 flex flex-col flex-1">
+                                <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    🎓
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Duration:</span>
-                                    <span className="font-medium">{cls.durationMonths} months</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Monthly:</span>
-                                    <span className="font-medium text-teal-600">${cls.monthlyPrice}</span>
-                                </div>
-                            </div>
 
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => handleEditClick(cls)}
-                                    className="flex-1 py-2 px-4 rounded-lg border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium transition-colors"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/dashboard/classes/${cls.id}`)}
-                                    className="flex-1 py-2 px-4 rounded-lg bg-black text-white hover:bg-gray-800 font-medium transition-colors"
-                                >
-                                    Manage
-                                </button>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Class ID: {cls.id}</span>
+
+                                <h3 className="text-2xl font-black text-gray-900 mb-3 leading-tight group-hover:text-teal-700 transition-colors line-clamp-2">
+                                    {cls.className}
+                                </h3>
+
+                                <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed">
+                                    {cls.description || "No description provided."}
+                                </p>
+
+                                <div className="mt-auto space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Monthly</p>
+                                            <p className="text-lg font-black text-gray-900">${cls.monthlyPrice}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Start</p>
+                                            <p className="text-base font-bold text-gray-900">{cls.startMonth}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => handleEditClick(cls)}
+                                            className="w-full py-3.5 rounded-xl border-2 border-gray-100 text-gray-600 font-bold hover:border-teal-500 hover:text-teal-600 transition-all active:scale-95"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => navigate(`/dashboard/classes/${cls.id}`)}
+                                            className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-bold hover:bg-black transition-all shadow-lg hover:shadow-xl active:scale-95"
+                                        >
+                                            Manage
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
