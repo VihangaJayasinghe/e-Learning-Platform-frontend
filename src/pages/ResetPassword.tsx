@@ -13,11 +13,13 @@ import {
   Check,
 } from "lucide-react";
 
+// ResetPassword component for handling password reset functionality
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
 
+  // State management for new password, confirmation, messages, errors, loading, and password requirements
   const [passwords, setPasswords] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -50,6 +52,7 @@ const ResetPassword: React.FC = () => {
     passwords.newPassword.length > 0 &&
     passwords.newPassword === passwords.confirmPassword;
 
+  // Handle form submission for password reset, including validation and API interaction
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");

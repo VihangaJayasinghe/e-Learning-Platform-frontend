@@ -14,8 +14,10 @@ import {
   X,
 } from "lucide-react";
 
+// Define a type for user roles to ensure only valid roles are used
 type UserRole = "student" | "teacher";
 
+// Define the shape of the registration form data
 interface RegistrationData {
   username: string;
   first_name: string;
@@ -31,6 +33,7 @@ interface RegistrationData {
   mobile_number?: string;
 }
 
+// Registration component for new user sign-up
 const Register: React.FC = () => {
   const [role, setRole] = useState<UserRole>("student");
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,6 +41,7 @@ const Register: React.FC = () => {
   const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
 
+  // State to hold form data with initial empty values
   const [formData, setFormData] = useState<RegistrationData>({
     username: "",
     first_name: "",
@@ -53,6 +57,7 @@ const Register: React.FC = () => {
     mobile_number: "",
   });
 
+  // State to track password requirements for live validation feedback
   const [requirements, setRequirements] = useState({
     length: false,
     uppercase: false,
@@ -60,6 +65,7 @@ const Register: React.FC = () => {
     special: false,
   });
 
+  // Effect to validate password requirements whenever the password field changes
   useEffect(() => {
     const pass = formData.password;
     setRequirements({
@@ -77,6 +83,7 @@ const Register: React.FC = () => {
   const isNicValid = formData.nic?.length === 12;
   const isMobileValid = formData.mobile_number?.length === 10;
 
+  // Handle input changes for all form fields, with special handling for numeric fields
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -91,12 +98,14 @@ const Register: React.FC = () => {
     }
   };
 
+  // Handle form submission for registration, including validation and API interaction
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
 
+    // Check if all password requirements are met before allowing submission
     const allMet = Object.values(requirements).every(Boolean);
     if (!allMet) {
       setError("Please meet all password requirements.");
@@ -104,12 +113,14 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Check if passwords match before allowing submission
     if (!passwordsMatch) {
       setError("Passwords do not match!");
       setLoading(false);
       return;
     }
 
+    // Additional validation for teacher role specific fields
     if (role === "teacher") {
       if (!isNicValid) {
         setError("NIC must be exactly 12 digits.");
@@ -123,6 +134,7 @@ const Register: React.FC = () => {
       }
     }
 
+    // Determine the appropriate API endpoint based on the selected user role
     const endpoint =
       role === "student" ? "/register/student" : "/register/teacher";
 
@@ -145,6 +157,7 @@ const Register: React.FC = () => {
     }
   };
 
+  // Component to display individual password requirement with visual feedback
   const Requirement = ({ met, text }: { met: boolean; text: string }) => (
     <div
       className={`flex items-center gap-1.5 text-[10px] font-bold transition-colors ${met ? "text-green-600" : "text-gray-400"}`}
