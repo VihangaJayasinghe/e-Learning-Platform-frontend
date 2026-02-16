@@ -11,13 +11,13 @@ import {
 } from "lucide-react";
 
 const ForgotPassword: React.FC = () => {
-  // 1. Adding explicit types to useState hooks
+  // 1. State management for form input, messages, and loading state
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // 2. Typing the Form Event
+  // 2. Handle form submission for password recovery
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
