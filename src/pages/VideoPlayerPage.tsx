@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-// import "videojs-hls-quality-selector"; // We are using a custom implementation
 import "videojs-contrib-quality-levels";
 import { getVideoById } from "../services/api";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
+import { AuthContext } from "../context/AuthContext";
 
 interface VideoData {
     id: string;
@@ -19,12 +19,25 @@ interface VideoData {
 const VideoPlayerPage: React.FC = () => {
     const { videoId } = useParams<{ videoId: string }>();
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext) || {};
     const videoNode = useRef<HTMLDivElement>(null);
     const playerRef = useRef<any | null>(null);
 
     const [video, setVideo] = useState<VideoData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [watermarkPos, setWatermarkPos] = useState({ top: 10, left: 10 });
+
+    useEffect(() => {
+        // Randomize watermark position every 5 seconds
+        const interval = setInterval(() => {
+            const randomTop = Math.floor(Math.random() * 80) + 10;
+            const randomLeft = Math.floor(Math.random() * 80) + 10;
+            setWatermarkPos({ top: randomTop, left: randomLeft });
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const fetchVideo = async () => {
@@ -347,11 +360,25 @@ const VideoPlayerPage: React.FC = () => {
                     <div className="bg-black rounded-[24px] overflow-hidden shadow-2xl shadow-teal-900/20 border border-gray-200 relative group">
                         <div data-vjs-player className="relative">
                             <div ref={videoNode} />
+
+                            {/* Security Watermark */}
+                            {user?.username && (
+                                <div
+                                    className="absolute text-white/30 text-lg font-bold pointer-events-none select-none z-50 transition-all duration-1000 ease-in-out"
+                                    style={{
+                                        top: `${watermarkPos.top}%`,
+                                        left: `${watermarkPos.left}%`,
+                                        textShadow: '0 0 4px rgba(0,0,0,0.5)'
+                                    }}
+                                >
+                                    {user.username}
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2">
+                    <div className="mt-8">
+                        <div className="max-w-4xl">
                             <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight leading-tight">{video.videoName}</h1>
                             <div className="flex items-center gap-4 mb-6">
                                 <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -361,18 +388,6 @@ const VideoPlayerPage: React.FC = () => {
                             </div>
                             <div className="prose prose-lg text-gray-600">
                                 <p className="leading-relaxed">{video.description}</p>
-                            </div>
-                        </div>
-
-                        {/* Optional Sidebar Area for Up Next or Related (Placeholder) */}
-                        <div className="bg-gray-50 rounded-[24px] p-6 border border-gray-100 h-fit">
-                            <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-widest">About this video</h3>
-                            <div className="space-y-4">
-                                <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                                    <p className="text-sm text-gray-500 mb-1">Content Type</p>
-                                    <p className="font-semibold text-gray-800 font-mono text-sm">{video.contentType}</p>
-                                </div>
-                                {/* Add more details if available */}
                             </div>
                         </div>
                     </div>
