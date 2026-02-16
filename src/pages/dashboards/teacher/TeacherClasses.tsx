@@ -133,12 +133,13 @@ const TeacherClasses: React.FC = () => {
                                         value={cls.status || 'DRAFT'}
                                         onChange={(e) => handleStatusChange(cls.id, e.target.value, e)}
                                         className={`appearance-none px-4 py-1.5 text-xs font-black rounded-full uppercase tracking-widest border-none focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer shadow-sm transition-all ${cls.status === 'ACTIVE' ? "bg-teal-500 text-white" :
-                                                cls.status === 'INACTIVE' ? "bg-yellow-400 text-yellow-900" :
-                                                    cls.status === 'ARCHIVED' ? "bg-gray-800 text-gray-200" :
-                                                        "bg-white text-gray-500"
+                                            cls.status === 'INACTIVE' ? "bg-yellow-400 text-yellow-900" :
+                                                cls.status === 'ARCHIVED' ? "bg-gray-800 text-gray-200" :
+                                                    "bg-white text-gray-500"
                                             }`}
                                     >
-                                        <option value="DRAFT">Draft</option>
+
+                                        <option value="DRAFT" hidden>Draft</option>
                                         <option value="ACTIVE">Active</option>
                                         <option value="INACTIVE">Inactive</option>
                                         <option value="ARCHIVED">Archived</option>
@@ -147,9 +148,7 @@ const TeacherClasses: React.FC = () => {
                             </div>
 
                             <div className="p-8 -mt-12 relative z-10 flex flex-col flex-1">
-                                <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                                    🎓
-                                </div>
+
 
                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Class ID: {cls.id}</span>
 
