@@ -1,12 +1,71 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Shield, Server, Lock, Database } from "lucide-react";
+import { ArrowLeft, Shield, Server, Lock, Database, X } from "lucide-react";
+import { getSystemStats, type SystemStats } from "../services/api";
 
 const SystemAdmin: React.FC = () => {
     const navigate = useNavigate();
+    const [stats, setStats] = useState<SystemStats | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [showStatsModal, setShowStatsModal] = useState(false);
+
+    const handleServerStatusClick = async () => {
+        setLoading(true);
+        try {
+            const data = await getSystemStats();
+            setStats(data);
+            setShowStatsModal(true);
+        } catch (error) {
+            console.error("Failed to fetch system stats", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="p-6">
+        <div className="p-6 relative">
+            {showStatsModal && stats && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fadeIn">
+                        <button
+                            onClick={() => setShowStatsModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                                <Server size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">System Statistics</h3>
+                                <p className="text-sm text-gray-500">Live platform metrics</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <span className="text-gray-600 font-medium">Total Courses</span>
+                                <span className="text-2xl font-black text-gray-900">{stats.totalCourses}</span>
+                            </div>
+                            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <span className="text-gray-600 font-medium">Total Videos</span>
+                                <span className="text-2xl font-black text-gray-900">{stats.totalVideos}</span>
+                            </div>
+                            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <span className="text-gray-600 font-medium">Total Instructors</span>
+                                <span className="text-2xl font-black text-gray-900">{stats.totalInstructors}</span>
+                            </div>
+                            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <span className="text-gray-600 font-medium">Total Students</span>
+                                <span className="text-2xl font-black text-gray-900">{stats.totalStudents}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <button
                 onClick={() => navigate("/dashboard")}
                 className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-8 group"
@@ -30,17 +89,21 @@ const SystemAdmin: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Server Status Card */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 hover:shadow-xl transition-shadow">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 text-blue-600">
+                <div
+                    onClick={handleServerStatusClick}
+                    className="bg-white p-6 rounded-2xl border border-gray-100 hover:shadow-xl transition-all cursor-pointer group hover:border-blue-500"
+                >
+                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <Server size={24} />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">Server Status</h3>
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                         <span className="text-sm font-medium text-green-600">Operational</span>
+                        {loading && <span className="text-xs text-gray-400 ml-2">Fetching stats...</span>}
                     </div>
                     <p className="text-gray-500 text-sm">
-                        Monitor server health, uptime, and resource usage.
+                        Click to view detailed system statistics and metrics.
                     </p>
                 </div>
 

@@ -93,10 +93,48 @@ const AdminDashboard: React.FC = () => {
                         />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        Video Catalog
+                    </h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">
+                        Review and manage the video catalog available to students.
+                    </p>
+                </div>
+
+                {/* New Card: Course Catalog */}
+                <div
+                    onClick={() => navigate("/dashboard/admin-courses")}
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 cursor-pointer"
+                >
+                    <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors duration-500">
+                        <BookOpen
+                            className="text-indigo-600 group-hover:text-white"
+                            size={28}
+                        />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
                         Course Catalog
                     </h3>
                     <p className="text-gray-500 text-sm leading-relaxed">
-                        Review and manage the course catalog available to students.
+                        View and manage all courses on the platform.
+                    </p>
+                </div>
+
+
+                {/* New Card: Class Catalog */}
+                <div
+                    onClick={() => navigate("/dashboard/admin-classes")}
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-100/50 transition-all duration-500 cursor-pointer"
+                >
+                    <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors duration-500">
+                        <div className="text-purple-600 group-hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10v6" /><path d="M2 10l10-5 10 5-10 5z" /><path d="M12 12v9" /></svg>
+                        </div>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        Class Catalog
+                    </h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">
+                        View and manage active classes and monthly schedules.
                     </p>
                 </div>
 
