@@ -3,14 +3,12 @@ import axios, { type AxiosInstance } from "axios";
 // 1. Define the base API instance with a Type
 const api: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/users",
+  // 2. Set default headers and withCredentials for authentication
   headers: {
     "Content-Type": "application/json",
   },
   withCredentials: true,
 });
-
-// 2. We will add Response Interfaces here later
-// Example: export interface UserResponse { id: string; email: string; ... }
 
 // Export the user-centric API as default (keeping existing behavior)
 export default api;
@@ -64,10 +62,17 @@ export const updateClassStatus = async (id: string, status: string) => {
   return response.data;
 };
 
-export const extendClassDuration = async (id: string, additionalMonths: number) => {
-  const response = await classApi.post(`/${id}/extend`, {}, {
-    params: { additionalMonths }
-  });
+export const extendClassDuration = async (
+  id: string,
+  additionalMonths: number,
+) => {
+  const response = await classApi.post(
+    `/${id}/extend`,
+    {},
+    {
+      params: { additionalMonths },
+    },
+  );
   return response.data;
 };
 
@@ -75,13 +80,25 @@ export const deleteClass = async (id: string) => {
   await classApi.delete(`/${id}`);
 };
 
-export const addVideoToMonth = async (classId: string, yearMonth: string, videoId: string) => {
-  const response = await classApi.post(`/${classId}/months/${yearMonth}/videos/${videoId}`);
+export const addVideoToMonth = async (
+  classId: string,
+  yearMonth: string,
+  videoId: string,
+) => {
+  const response = await classApi.post(
+    `/${classId}/months/${yearMonth}/videos/${videoId}`,
+  );
   return response.data;
 };
 
-export const removeVideoFromMonth = async (classId: string, yearMonth: string, videoId: string) => {
-  const response = await classApi.delete(`/${classId}/months/${yearMonth}/videos/${videoId}`);
+export const removeVideoFromMonth = async (
+  classId: string,
+  yearMonth: string,
+  videoId: string,
+) => {
+  const response = await classApi.delete(
+    `/${classId}/months/${yearMonth}/videos/${videoId}`,
+  );
   return response.data;
 };
 
@@ -91,17 +108,23 @@ export const getMonthVideos = async (classId: string, yearMonth: string) => {
 };
 
 export const getMonthDocuments = async (classId: string, yearMonth: string) => {
-  const response = await classApi.get(`/${classId}/months/${yearMonth}/documents`);
+  const response = await classApi.get(
+    `/${classId}/months/${yearMonth}/documents`,
+  );
   return response.data;
 };
 
 export const releaseMonth = async (classId: string, yearMonth: string) => {
-  const response = await classApi.post(`/${classId}/months/${yearMonth}/release`);
+  const response = await classApi.post(
+    `/${classId}/months/${yearMonth}/release`,
+  );
   return response.data;
 };
 
 export const unreleaseMonth = async (classId: string, yearMonth: string) => {
-  const response = await classApi.post(`/${classId}/months/${yearMonth}/unrelease`);
+  const response = await classApi.post(
+    `/${classId}/months/${yearMonth}/unrelease`,
+  );
   return response.data;
 };
 
@@ -136,7 +159,10 @@ export const getVideoById = async (id: string) => {
   return response.data;
 };
 
-export const uploadVideo = async (formData: FormData, onUploadProgress?: (progressEvent: any) => void) => {
+export const uploadVideo = async (
+  formData: FormData,
+  onUploadProgress?: (progressEvent: any) => void,
+) => {
   const response = await videoApi.post("/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -182,13 +208,25 @@ export const deleteDocument = async (id: string) => {
   await documentApi.delete(`/${id}`);
 };
 
-export const addDocumentToMonth = async (classId: string, yearMonth: string, documentId: string) => {
-  const response = await classApi.post(`/${classId}/months/${yearMonth}/documents/${documentId}`);
+export const addDocumentToMonth = async (
+  classId: string,
+  yearMonth: string,
+  documentId: string,
+) => {
+  const response = await classApi.post(
+    `/${classId}/months/${yearMonth}/documents/${documentId}`,
+  );
   return response.data;
 };
 
-export const removeDocumentFromMonth = async (classId: string, yearMonth: string, documentId: string) => {
-  const response = await classApi.delete(`/${classId}/months/${yearMonth}/documents/${documentId}`);
+export const removeDocumentFromMonth = async (
+  classId: string,
+  yearMonth: string,
+  documentId: string,
+) => {
+  const response = await classApi.delete(
+    `/${classId}/months/${yearMonth}/documents/${documentId}`,
+  );
   return response.data;
 };
 
@@ -201,7 +239,10 @@ export const quizApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-export const getQuizzesByClassAndMonth = async (classId: string, monthId: string) => {
+export const getQuizzesByClassAndMonth = async (
+  classId: string,
+  monthId: string,
+) => {
   const response = await quizApi.get(`/class/${classId}/month/${monthId}`);
   return response.data;
 };
@@ -215,8 +256,16 @@ export const paymentApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-export const initiatePayment = async (classId: string, yearMonth: string, amount: number) => {
-  const response = await paymentApi.post('/initiate', { classId, yearMonth, amount });
+export const initiatePayment = async (
+  classId: string,
+  yearMonth: string,
+  amount: number,
+) => {
+  const response = await paymentApi.post("/initiate", {
+    classId,
+    yearMonth,
+    amount,
+  });
   return response.data;
 };
 
@@ -226,19 +275,19 @@ export const completePayment = async (paymentId: string) => {
 };
 
 export const checkMonthAccess = async (classId: string, yearMonth: string) => {
-  // Access check is often a GET on the payments resource or a dedicated endpoint. 
+  // Access check is often a GET on the payments resource or a dedicated endpoint.
   // Based on doc: GET /api/payments/access/{classId}/{yearMonth}
   const response = await paymentApi.get(`/access/${classId}/${yearMonth}`);
   return response.data;
 };
 
 export const getMyPayments = async () => {
-  const response = await paymentApi.get('/my-payments');
+  const response = await paymentApi.get("/my-payments");
   return response.data;
 };
 
 // --- Teacher Analytics ---
-// The doc says: GET /api/teachers/payments. This might be a separate controller. 
+// The doc says: GET /api/teachers/payments. This might be a separate controller.
 // Let's use a specific call or the default api if it's under users, but doc says /api/teachers/payments.
 // Assuming it's distinct, let's use the full URL or a teacherApi if needed.
 // For now, let's try using the paymentApi if the backend groups it there, OR creating a teacherApi.
@@ -253,12 +302,12 @@ export const teacherApi: AxiosInstance = axios.create({
 });
 
 export const getTeacherPayments = async () => {
-  const response = await teacherApi.get('/payments');
+  const response = await teacherApi.get("/payments");
   return response.data;
 };
 
 export const getTeacherAnalytics = async () => {
-  const response = await teacherApi.get('/analytics');
+  const response = await teacherApi.get("/analytics");
   return response.data;
 };
 
@@ -282,13 +331,25 @@ export const addQuestionToQuiz = async (quizId: string, questionData: any) => {
   return response.data;
 };
 
-export const updateQuestionInQuiz = async (quizId: string, questionId: string, questionData: any) => {
-  const response = await quizApi.put(`/${quizId}/update-question/${questionId}`, questionData);
+export const updateQuestionInQuiz = async (
+  quizId: string,
+  questionId: string,
+  questionData: any,
+) => {
+  const response = await quizApi.put(
+    `/${quizId}/update-question/${questionId}`,
+    questionData,
+  );
   return response.data;
 };
 
-export const deleteQuestionFromQuiz = async (quizId: string, questionId: string) => {
-  const response = await quizApi.delete(`/${quizId}/delete-question/${questionId}`);
+export const deleteQuestionFromQuiz = async (
+  quizId: string,
+  questionId: string,
+) => {
+  const response = await quizApi.delete(
+    `/${quizId}/delete-question/${questionId}`,
+  );
   return response.data;
 };
 
@@ -318,16 +379,24 @@ export const getQuizForStudent = async (quizId: string) => {
   return response.data;
 };
 
-export const startQuizAttempt = async (quizId: string, studentId: string, studentName: string) => {
+export const startQuizAttempt = async (
+  quizId: string,
+  studentId: string,
+  studentName: string,
+) => {
   const response = await quizAttemptApi.post(
-    `/start?quizId=${quizId}&studentId=${studentId}&studentName=${encodeURIComponent(studentName)}`
+    `/start?quizId=${quizId}&studentId=${studentId}&studentName=${encodeURIComponent(studentName)}`,
   );
   return response.data;
 };
 
-export const submitQuizAnswer = async (attemptId: string, questionId: string, selectedAnswerIndex: number) => {
+export const submitQuizAnswer = async (
+  attemptId: string,
+  questionId: string,
+  selectedAnswerIndex: number,
+) => {
   const response = await quizAttemptApi.post(
-    `/${attemptId}/answer?questionId=${questionId}&selectedAnswerIndex=${selectedAnswerIndex}`
+    `/${attemptId}/answer?questionId=${questionId}&selectedAnswerIndex=${selectedAnswerIndex}`,
   );
   return response.data;
 };
@@ -337,8 +406,13 @@ export const completeQuizAttempt = async (attemptId: string) => {
   return response.data;
 };
 
-export const getStudentQuizResult = async (quizId: string, studentId: string) => {
-  const response = await quizAttemptApi.get(`/quiz/${quizId}/student/${studentId}/result`);
+export const getStudentQuizResult = async (
+  quizId: string,
+  studentId: string,
+) => {
+  const response = await quizAttemptApi.get(
+    `/quiz/${quizId}/student/${studentId}/result`,
+  );
   return response.data;
 };
 

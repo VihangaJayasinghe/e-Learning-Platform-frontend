@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Define the User interface to match your backend response
+// Define the User interface to match backend response
 export interface User {
   id: string;
   username: string;
@@ -17,6 +17,7 @@ export interface User {
   qualification?: string;
 }
 
+// Define the shape of the AuthContext
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
@@ -24,10 +25,12 @@ interface AuthContextType {
   loading: boolean;
 }
 
+// Create the AuthContext with an undefined default value
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
 
+// AuthProvider component to wrap the application and provide authentication state
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,19 +48,21 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Function to handle user login, storing user data in localStorage and updating state
   const login = (userData: User) => {
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
     navigate("/dashboard");
   };
 
+  // Function to handle user logout, clearing localStorage and updating state
   const logout = () => {
     localStorage.removeItem("user");
     setUser(null);
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     navigate("/login");
   };
-
+  // Provide the user, login, logout, and loading state to the context consumers
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
