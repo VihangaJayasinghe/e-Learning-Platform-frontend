@@ -55,28 +55,21 @@ const AllUsers: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            // 1. Try server-side search
-            // We assume the API might return 404 if not found, or a single user object, or an array.
+
             const response = await adminApi.get(`/users/${trimmedUsername}`);
             const data = Array.isArray(response.data) ? response.data : [response.data];
 
-            // If we got data, use it.
-            // Note: If the API returns an empty array for "found nothing", we verify length.
-            // If it returns a 404, we catch it below.
+
             if (data.length > 0 && data[0]) {
                 setUsers(data);
             } else {
-                // If successful response but empty data, treat as "not found" conceptually
-                // But typically /users/ID returns the object or 404. 
-                // If it returns empty array, then we found "no users matching exact ID".
-                // We might want to try partial search via fallback if this was an exact match attempt.
+
                 throw new Error("No exact match found, trying fallback");
             }
         } catch (err) {
             console.warn("Server-side search failed or not found, falling back to client-side filtering:", err);
 
-            // 2. Fallback: Fetch all users and filter client-side
-            // This handles partial matches and cases where the specific ID endpoint fails
+
             try {
                 const response = await adminApi.get("/users");
                 if (Array.isArray(response.data)) {
