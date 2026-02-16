@@ -4,7 +4,7 @@ import { Loader2, DollarSign, Calendar, User, BookOpen } from "lucide-react";
 
 interface Payment {
     id: string;
-    student: { username: string };
+    student: { username: string } | null;
     classId: string;
     className: string;
     yearMonth: string;
@@ -87,7 +87,7 @@ const TeacherPayments: React.FC = () => {
                                             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
                                                 <User size={16} />
                                             </div>
-                                            {payment.student.username}
+                                            {payment.student?.username || "Unknown Student"}
                                         </div>
                                     </td>
                                     <td className="p-4 text-gray-600">
