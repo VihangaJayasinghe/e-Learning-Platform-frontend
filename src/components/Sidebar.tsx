@@ -105,7 +105,7 @@ const Sidebar: React.FC = () => {
             ${isActive ? "text-teal-500" : "text-gray-400 hover:text-gray-100"}
           `}
                 >
-                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                    <item.icon size={32} strokeWidth={isActive ? 2.5 : 2} />
                 </button>
 
                 {/* Tooltip */}
@@ -117,7 +117,7 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <aside className="w-16 bg-black flex flex-col items-center py-4 h-screen fixed left-0 top-0 border-r border-gray-800 z-50">
+        <aside className="w-16 bg-black flex flex-col items-center py-4 fixed left-0 top-16 bottom-0 border-r border-gray-800 z-40">
             {/* Top Logo / Menu */}
             {/*  <div className="mb-8 text-teal-500">
           <Menu size={28} /> 
@@ -147,11 +147,6 @@ const Sidebar: React.FC = () => {
                     <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-lg border border-gray-700">
                         Logout
                     </div>
-                </div>
-
-                {/* User Avatar (Small) */}
-                <div className="mt-4 w-8 h-8 rounded-full bg-teal-900/50 flex items-center justify-center text-teal-500 text-xs font-bold border border-teal-500/30 cursor-default">
-                    {user?.username?.charAt(0).toUpperCase()}
                 </div>
             </div>
         </aside>
