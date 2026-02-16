@@ -2,22 +2,13 @@ import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { AxiosError } from "axios";
-import {
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
-  Check,
-  ShieldCheck,
-  ShieldAlert,
-  Smartphone,
-  Fingerprint,
-  X,
-} from "lucide-react";
+import { Loader2, Check, User, GraduationCap, ArrowRight, ArrowLeft } from "lucide-react";
+import AuthLayout from "../components/layouts/AuthLayout";
+import studentImage from "../src/images/signinpage.webp";
+import teacherImage from "../src/images/teachersigninpage.webp";
 
-// Define a type for user roles to ensure only valid roles are used
 type UserRole = "student" | "teacher";
 
-// Define the shape of the registration form data
 interface RegistrationData {
   username: string;
   first_name: string;
@@ -33,15 +24,14 @@ interface RegistrationData {
   mobile_number?: string;
 }
 
-// Registration component for new user sign-up
 const Register: React.FC = () => {
   const [role, setRole] = useState<UserRole>("student");
+  const [step, setStep] = useState<number>(1); // For Teacher 2-step process
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
 
-  // State to hold form data with initial empty values
   const [formData, setFormData] = useState<RegistrationData>({
     username: "",
     first_name: "",
@@ -57,7 +47,6 @@ const Register: React.FC = () => {
     mobile_number: "",
   });
 
-  // State to track password requirements for live validation feedback
   const [requirements, setRequirements] = useState({
     length: false,
     uppercase: false,
@@ -65,7 +54,6 @@ const Register: React.FC = () => {
     special: false,
   });
 
-  // Effect to validate password requirements whenever the password field changes
   useEffect(() => {
     const pass = formData.password;
     setRequirements({
@@ -76,394 +64,204 @@ const Register: React.FC = () => {
     });
   }, [formData.password]);
 
-  // Live Validation States
-  const passwordsMatch =
-    formData.password.length > 0 &&
-    formData.password === formData.confirmPassword;
-  const isNicValid = formData.nic?.length === 12;
-  const isMobileValid = formData.mobile_number?.length === 10;
+  const passwordsMatch = formData.password.length > 0 && formData.password === formData.confirmPassword;
 
-  // Handle input changes for all form fields, with special handling for numeric fields
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === "nic" || name === "mobile_number") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value.replace(/[^0-9]/g, ""),
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value.replace(/[^0-9]/g, "") }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // Handle form submission for registration, including validation and API interaction
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleNextStep = () => {
+    // Basic validation for Step 1
+    if (!formData.first_name || !formData.last_name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    if (!passwordsMatch) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (!Object.values(requirements).every(Boolean)) {
+      setError("Password does not meet requirements.");
+      return;
+    }
+
+    setError("");
+    setStep(2);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
 
-    // Check if all password requirements are met before allowing submission
-    const allMet = Object.values(requirements).every(Boolean);
-    if (!allMet) {
-      setError("Please meet all password requirements.");
-      setLoading(false);
-      return;
-    }
-
-    // Check if passwords match before allowing submission
-    if (!passwordsMatch) {
+    if (role === "student" && !passwordsMatch) {
       setError("Passwords do not match!");
       setLoading(false);
       return;
     }
 
-    // Additional validation for teacher role specific fields
-    if (role === "teacher") {
-      if (!isNicValid) {
-        setError("NIC must be exactly 12 digits.");
-        setLoading(false);
-        return;
-      }
-      if (!isMobileValid) {
-        setError("Mobile number must be exactly 10 digits.");
-        setLoading(false);
-        return;
-      }
-    }
-
-    // Determine the appropriate API endpoint based on the selected user role
-    const endpoint =
-      role === "student" ? "/register/student" : "/register/teacher";
+    const endpoint = role === "student" ? "/register/student" : "/register/teacher";
 
     try {
       const { confirmPassword, ...dataToSend } = formData;
       await api.post(endpoint, dataToSend);
-      setSuccess("Account created successfully! Redirecting...");
+      setSuccess("Account created successfully!");
       setLoading(false);
-      setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       const axiosError = err as AxiosError<any>;
-      const backendMessage =
-        axiosError.response?.data?.message || axiosError.response?.data;
-      setError(
-        typeof backendMessage === "string"
-          ? backendMessage
-          : "Registration failed.",
-      );
+      const backendMessage = axiosError.response?.data?.message || axiosError.response?.data;
+      setError(typeof backendMessage === "string" ? backendMessage : "Registration failed.");
       setLoading(false);
     }
   };
 
-  // Component to display individual password requirement with visual feedback
   const Requirement = ({ met, text }: { met: boolean; text: string }) => (
-    <div
-      className={`flex items-center gap-1.5 text-[10px] font-bold transition-colors ${met ? "text-green-600" : "text-gray-400"}`}
-    >
-      {met ? (
-        <Check size={12} strokeWidth={3} />
-      ) : (
-        <div className="w-3 h-3 border-2 border-gray-200 rounded-full" />
-      )}
+    <div className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${met ? "text-teal-600" : "text-gray-300"}`}>
+      <div className={`w-3 h-3 rounded-full flex items-center justify-center border ${met ? "bg-teal-600 border-teal-600" : "border-gray-200"}`}>
+        {met && <Check size={8} className="text-white" strokeWidth={4} />}
+      </div>
       {text}
     </div>
   );
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center relative py-12 px-6 font-sans"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')`,
-      }}
-    >
-      <div className="absolute inset-0 bg-black/20"></div>
-
-      <div className="relative z-10 w-full max-w-lg bg-white/70 backdrop-blur-xl rounded-[40px] shadow-2xl p-10 border border-white/40">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">
-            Create Account
-          </h1>
-          <p className="text-gray-500 text-sm mt-1 font-medium">
-            Join the ELP learning community
-          </p>
-        </div>
-
-        <div className="flex mb-6 bg-white/50 rounded-2xl p-1 border border-gray-100">
+    <div className="animate-in slide-in-from-right duration-500 ease-out">
+      <AuthLayout
+        imageSrc={role === "student" ? studentImage : teacherImage}
+        title={`Join as a ${role === "student" ? "Student" : "Teacher"}`}
+        subtitle={step === 2 && role === "teacher" ? "Professional Details" : "Create your account today."}
+        reverse={true} // Image Left, Form Right
+      >
+        <div className="flex bg-gray-100 p-1 rounded-xl mb-8 max-w-sm">
           <button
             type="button"
-            disabled={loading || !!success}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${role === "student" ? "bg-blue-600 text-white shadow-lg" : "text-gray-500"}`}
-            onClick={() => setRole("student")}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${role === "student" ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"}`}
+            onClick={() => { setRole("student"); setStep(1); }}
           >
-            STUDENT
+            <User size={16} strokeWidth={2.5} /> Student
           </button>
           <button
             type="button"
-            disabled={loading || !!success}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${role === "teacher" ? "bg-blue-600 text-white shadow-lg" : "text-gray-500"}`}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${role === "teacher" ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"}`}
             onClick={() => setRole("teacher")}
           >
-            TEACHER
+            <GraduationCap size={16} strokeWidth={2.5} /> Teacher
           </button>
         </div>
 
-        {success && (
-          <div className="mb-6 p-4 bg-green-50/90 border border-green-200 rounded-2xl flex items-center gap-2 text-green-700 text-xs font-bold animate-in fade-in zoom-in-95 duration-500">
-            <CheckCircle2 size={16} /> {success}
-          </div>
-        )}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50/80 border border-red-100 rounded-2xl flex items-center gap-2 text-red-600 text-xs font-bold animate-in fade-in zoom-in-95 duration-300">
-            <AlertCircle size={16} /> {error}
-          </div>
-        )}
+        {error && <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm font-bold rounded-xl border border-red-100 animate-in fade-in zoom-in-95">{error}</div>}
+        {success && <div className="mb-6 p-4 bg-teal-50 text-teal-700 text-sm font-bold rounded-xl border border-teal-100 animate-in fade-in zoom-in-95">{success}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                First Name
-              </label>
-              <input
-                name="first_name"
-                required
-                disabled={!!success}
-                value={formData.first_name}
-                onChange={handleChange}
-                placeholder="John"
-                className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                Last Name
-              </label>
-              <input
-                name="last_name"
-                required
-                disabled={!!success}
-                value={formData.last_name}
-                onChange={handleChange}
-                placeholder="Doe"
-                className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-              />
-            </div>
-          </div>
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-5 max-w-lg">
 
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              disabled={!!success}
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="john.doe@example.com"
-              className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-              Username
-            </label>
-            <input
-              name="username"
-              required
-              disabled={!!success}
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="johndoe123"
-              className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                Password
-              </label>
-              <input
-                name="password"
-                type="password"
-                required
-                disabled={!!success}
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-              />
-            </div>
-            <div className="space-y-1 relative">
-              <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                Confirm
-              </label>
-              <input
-                name="confirmPassword"
-                type="password"
-                required
-                disabled={!!success}
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none font-medium text-sm"
-              />
-              {formData.confirmPassword && (
-                <div
-                  className={`absolute right-4 top-9 transition-colors ${passwordsMatch ? "text-green-500" : "text-red-400"}`}
-                >
-                  {passwordsMatch ? (
-                    <ShieldCheck size={18} />
-                  ) : (
-                    <ShieldAlert size={18} />
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-white/30 p-3 rounded-2xl border border-white/40">
-            <Requirement met={requirements.length} text="8+ Characters" />
-            <Requirement met={requirements.uppercase} text="Uppercase Letter" />
-            <Requirement met={requirements.number} text="Includes Number" />
-            <Requirement met={requirements.special} text="Symbol (@$!%*?&)" />
-          </div>
-
-          {role === "teacher" && (
-            <div className="pt-4 space-y-4 border-t border-white/50 mt-4 animate-in fade-in duration-500">
+          {/* Step 1: Account Details (Always shown for Student, Step 1 for Teacher) */}
+          {step === 1 && (
+            <div className="space-y-5 animate-in fade-in slide-in-from-left-4 duration-300">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1 relative">
-                  <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                    NIC
-                  </label>
-                  <input
-                    name="nic"
-                    maxLength={12}
-                    required={role === "teacher"}
-                    disabled={!!success}
-                    value={formData.nic}
-                    onChange={handleChange}
-                    placeholder="e.g. 199512345678"
-                    className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none text-sm pr-10"
-                  />
-                  {formData.nic && (
-                    <div
-                      className={`absolute right-4 top-9 transition-colors ${isNicValid ? "text-green-500" : "text-red-400"}`}
-                    >
-                      {isNicValid ? <Check size={18} /> : <X size={18} />}
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-1 relative">
-                  <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                    Mobile
-                  </label>
-                  <input
-                    name="mobile_number"
-                    maxLength={10}
-                    required={role === "teacher"}
-                    disabled={!!success}
-                    value={formData.mobile_number}
-                    onChange={handleChange}
-                    placeholder="e.g. 0771234567"
-                    className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none text-sm pr-10"
-                  />
-                  {formData.mobile_number && (
-                    <div
-                      className={`absolute right-4 top-9 transition-colors ${isMobileValid ? "text-green-500" : "text-red-400"}`}
-                    >
-                      {isMobileValid ? <Check size={18} /> : <X size={18} />}
-                    </div>
-                  )}
-                </div>
+                <InputGroup label="First Name" name="first_name" placeholder="John" value={formData.first_name} onChange={handleChange} />
+                <InputGroup label="Last Name" name="last_name" placeholder="Doe" value={formData.last_name} onChange={handleChange} />
+              </div>
+
+              <InputGroup label="Email" name="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} />
+              <InputGroup label="Username" name="username" placeholder="johndoe" value={formData.username} onChange={handleChange} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <InputGroup label="Password" name="password" type="password" placeholder="••••••••" value={formData.password} onChange={handleChange} />
+                <InputGroup label="Confirm" name="confirmPassword" type="password" placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-y-2 bg-gray-50 p-3 rounded-xl border border-dashed border-gray-200">
+                <Requirement met={requirements.length} text="8+ Characters" />
+                <Requirement met={requirements.uppercase} text="Uppercase Letter" />
+                <Requirement met={requirements.number} text="Number" />
+                <Requirement met={requirements.special} text="Special Character" />
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Teacher Professional Details */}
+          {step === 2 && role === "teacher" && (
+            <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="grid grid-cols-2 gap-4">
+                <InputGroup label="NIC" name="nic" maxLength={12} placeholder="Identity Number" value={formData.nic} onChange={handleChange} />
+                <InputGroup label="Mobile" name="mobile_number" maxLength={10} placeholder="Mobile Number" value={formData.mobile_number} onChange={handleChange} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                    Qualification
-                  </label>
-                  <input
-                    name="qualification"
-                    disabled={!!success}
-                    value={formData.qualification}
-                    onChange={handleChange}
-                    placeholder="e.g. PhD in Computer Science"
-                    className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                    Exp (Years)
-                  </label>
-                  <input
-                    name="yearsOfExperience"
-                    type="number"
-                    disabled={!!success}
-                    value={formData.yearsOfExperience}
-                    onChange={handleChange}
-                    placeholder="e.g. 5"
-                    className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none text-sm"
-                  />
-                </div>
+                <InputGroup label="Qualification" name="qualification" placeholder="Degree/Diploma" value={formData.qualification} onChange={handleChange} />
+                <InputGroup label="Exp (Years)" name="yearsOfExperience" type="number" placeholder="Years" value={formData.yearsOfExperience} onChange={handleChange} />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                  Subject Expertise
-                </label>
-                <input
-                  name="subjectExpertise"
-                  disabled={!!success}
-                  value={formData.subjectExpertise}
-                  onChange={handleChange}
-                  placeholder="e.g. Full Stack Development"
-                  className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-500 ml-2 tracking-widest">
-                  Bio
-                </label>
+              <InputGroup label="Subject Expertise" name="subjectExpertise" placeholder="e.g. Mathematics" value={formData.subjectExpertise} onChange={handleChange} />
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">Bio</label>
                 <textarea
                   name="bio"
-                  disabled={!!success}
                   value={formData.bio}
                   onChange={handleChange}
-                  placeholder="Tell us about your teaching experience..."
-                  className="w-full px-5 py-3 bg-white/50 border border-gray-100 rounded-2xl outline-none resize-none h-20 text-sm font-medium"
+                  placeholder="Tell us about yourself..."
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none h-24 text-sm font-medium"
                 />
               </div>
             </div>
           )}
 
-          <button
-            disabled={loading || !!success}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 mt-4 active:scale-95 disabled:opacity-70"
-          >
-            {loading ? (
-              <Loader2 className="animate-spin" size={20} />
+          {/* Action Buttons */}
+          <div className="pt-2">
+            {role === "teacher" && step === 1 ? (
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                Next Step <ArrowRight size={20} strokeWidth={3} />
+              </button>
             ) : (
-              `REGISTER AS ${role.toUpperCase()}`
+              <div className="flex gap-3">
+                {step === 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
+                  >
+                    <ArrowLeft size={20} strokeWidth={3} /> Back
+                  </button>
+                )}
+                <button
+                  type="button" // Trigger submit via form handler or check validation first
+                  onClick={(e) => handleSubmit(e as any)}
+                  disabled={loading}
+                  className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Account"}
+                </button>
+              </div>
             )}
-          </button>
-        </form>
+          </div>
 
-        <p className="text-center text-gray-500 text-sm mt-6 font-medium">
-          Already a member?{" "}
-          <Link
-            to="/login"
-            className="text-blue-600 font-black hover:underline underline-offset-4"
-          >
-            Sign In
-          </Link>
-        </p>
-      </div>
+          <p className="text-center mt-6 text-sm font-medium text-gray-500">
+            Already have an account?{" "}
+            <Link to="/login" className="text-teal-600 font-bold hover:underline">Sign in</Link>
+          </p>
+        </form>
+      </AuthLayout>
     </div>
   );
 };
+
+const InputGroup = ({ label, ...props }: any) => (
+  <div className="w-full">
+    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 tracking-wide">{label}</label>
+    <input
+      {...props}
+      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-sm font-bold text-gray-900 placeholder-gray-300"
+    />
+  </div>
+);
 
 export default Register;
