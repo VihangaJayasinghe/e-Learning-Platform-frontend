@@ -46,7 +46,8 @@ const AllUsers: React.FC = () => {
 
     // Search user by username
     const searchUser = async (username: string) => {
-        if (!username.trim()) {
+        const trimmedUsername = username.trim();
+        if (!trimmedUsername) {
             fetchUsers(); // Reset to all users if search is empty
             return;
         }
@@ -54,14 +55,47 @@ const AllUsers: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await adminApi.get(`/users/${username}`);
-            // If the API returns a single object, wrap it in an array
+            // 1. Try server-side search
+            // We assume the API might return 404 if not found, or a single user object, or an array.
+            const response = await adminApi.get(`/users/${trimmedUsername}`);
             const data = Array.isArray(response.data) ? response.data : [response.data];
-            setUsers(data);
+
+            // If we got data, use it.
+            // Note: If the API returns an empty array for "found nothing", we verify length.
+            // If it returns a 404, we catch it below.
+            if (data.length > 0 && data[0]) {
+                setUsers(data);
+            } else {
+                // If successful response but empty data, treat as "not found" conceptually
+                // But typically /users/ID returns the object or 404. 
+                // If it returns empty array, then we found "no users matching exact ID".
+                // We might want to try partial search via fallback if this was an exact match attempt.
+                throw new Error("No exact match found, trying fallback");
+            }
         } catch (err) {
-            console.error("Error searching user:", err);
-            setError("User not found or error occurred.");
-            setUsers([]);
+            console.warn("Server-side search failed or not found, falling back to client-side filtering:", err);
+
+            // 2. Fallback: Fetch all users and filter client-side
+            // This handles partial matches and cases where the specific ID endpoint fails
+            try {
+                const response = await adminApi.get("/users");
+                if (Array.isArray(response.data)) {
+                    const allUsers = response.data as User[];
+                    const filteredUsers = allUsers.filter(user =>
+                        user.username.toLowerCase().includes(trimmedUsername.toLowerCase()) ||
+                        (user.email && user.email.toLowerCase().includes(trimmedUsername.toLowerCase()))
+                    );
+                    setUsers(filteredUsers);
+                    // Note: If filteredUsers is empty, the table will correctly show "No users found"
+                } else {
+                    setUsers([]);
+                    setError("Failed to load users for search.");
+                }
+            } catch (fallbackErr) {
+                console.error("Fallback search failed:", fallbackErr);
+                setError("Failed to search users.");
+                setUsers([]);
+            }
         } finally {
             setLoading(false);
         }
