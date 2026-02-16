@@ -13,6 +13,8 @@ const api: AxiosInstance = axios.create({
 // Export the user-centric API as default (keeping existing behavior)
 export default api;
 
+
+
 // 3. Define the Classes API instance
 export const classApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:9090/api/classes",
@@ -308,6 +310,16 @@ export const getTeacherPayments = async () => {
 
 export const getTeacherAnalytics = async () => {
   const response = await teacherApi.get("/analytics");
+  return response.data;
+};
+
+export const getAllTeachers = async () => {
+  const response = await teacherApi.get("");
+  return response.data;
+};
+
+export const getTeacherByUsername = async (username: string) => {
+  const response = await teacherApi.get(`/${username}`);
   return response.data;
 };
 
