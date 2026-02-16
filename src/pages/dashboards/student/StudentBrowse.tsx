@@ -10,7 +10,7 @@ interface Class {
     instructorUsername: string;
     schedule: string;
     duration: string;
-    price: string;
+    monthlyPrice: number;
     status: string;
     averageRating?: number;
 }
@@ -151,7 +151,7 @@ const StudentBrowse: React.FC = () => {
                                     </div>
                                     <div className="absolute top-4 right-4">
                                         <span className="bg-teal-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md">
-                                            ${cls.price}
+                                            ${cls.monthlyPrice}
                                         </span>
                                     </div>
                                 </div>
@@ -174,7 +174,7 @@ const StudentBrowse: React.FC = () => {
                                     <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-50">
                                         <div>
                                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Price</p>
-                                            <p className="text-xl font-black text-gray-900">${cls.price}<span className="text-sm text-gray-400 font-normal">/mo</span></p>
+                                            <p className="text-xl font-black text-gray-900">${cls.monthlyPrice}<span className="text-sm text-gray-400 font-normal">/mo</span></p>
                                         </div>
                                         <button
                                             onClick={() => navigate(`/dashboard/browse/${cls.id}`)}

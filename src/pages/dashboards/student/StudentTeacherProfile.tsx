@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { getTeacherByUsername, fetchClassesByInstructor } from "../../../services/api";
-import { Loader2, User, BookOpen, GraduationCap, MapPin, Calendar, Mail, ArrowLeft, Star } from "lucide-react";
+import { Loader2, User, BookOpen, GraduationCap, ArrowLeft, Star } from "lucide-react";
 
 interface Teacher {
     id: string;
@@ -22,7 +20,7 @@ interface Class {
     instructorUsername: string;
     schedule: string;
     duration: string;
-    price: string;
+    monthlyPrice: number;
     status: string;
 }
 
@@ -203,7 +201,7 @@ const StudentTeacherProfile: React.FC = () => {
                                     <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-50">
                                         <div>
                                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Price</p>
-                                            <p className="text-xl font-black text-gray-900">${cls.price}<span className="text-sm text-gray-400 font-normal">/mo</span></p>
+                                            <p className="text-xl font-black text-gray-900">${cls.monthlyPrice}<span className="text-sm text-gray-400 font-normal">/mo</span></p>
                                         </div>
                                         <button
                                             onClick={() => navigate(`/dashboard/browse/${cls.id}`)}
