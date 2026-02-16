@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loader2, X, CreditCard, Lock, CheckCircle } from "lucide-react";
+import {  X, CreditCard, Lock, CheckCircle } from "lucide-react";
 import { initiatePayment, completePayment } from "../../services/api";
 
 interface PaymentModalProps {
