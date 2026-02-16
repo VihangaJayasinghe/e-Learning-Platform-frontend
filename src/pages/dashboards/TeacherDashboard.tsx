@@ -5,7 +5,6 @@ import {
     Users,
     BookOpen,
     Settings,
-    FileText,
     Video,
     TrendingUp,
     DollarSign,
@@ -196,15 +195,15 @@ const TeacherDashboard: React.FC = () => {
                     </div>
 
                     <div
-                        onClick={() => navigate("/dashboard/documents")}
-                        className="group bg-white p-5 rounded-2xl border border-gray-100 hover:border-pink-500 hover:shadow-lg hover:shadow-pink-100/50 transition-all cursor-pointer flex items-center gap-4"
+                        onClick={() => navigate("/dashboard/classes")}
+                        className="group bg-white p-5 rounded-2xl border border-gray-100 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-100/50 transition-all cursor-pointer flex items-center gap-4"
                     >
-                        <div className="p-3 bg-pink-50 text-pink-600 rounded-xl group-hover:bg-pink-600 group-hover:text-white transition-colors">
-                            <FileText size={20} />
+                        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <BookOpen size={20} />
                         </div>
                         <div>
-                            <h4 className="font-bold text-gray-900">Course Materials</h4>
-                            <p className="text-xs text-gray-500">Upload Documents</p>
+                            <h4 className="font-bold text-gray-900">My Classes</h4>
+                            <p className="text-xs text-gray-500">Manage Courses</p>
                         </div>
                     </div>
 
