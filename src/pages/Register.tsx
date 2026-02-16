@@ -3,14 +3,13 @@ import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { AxiosError } from "axios";
 import {
+
   Loader2,
   AlertCircle,
   CheckCircle2,
   Check,
   ShieldCheck,
   ShieldAlert,
-  Smartphone,
-  Fingerprint,
   X,
 } from "lucide-react";
 

@@ -36,7 +36,6 @@ const TeacherDashboard: React.FC = () => {
     const navigate = useNavigate();
     const [analytics, setAnalytics] = useState<TeacherAnalytics | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
 
     const { user } = context || {};
 
@@ -48,7 +47,6 @@ const TeacherDashboard: React.FC = () => {
                 setAnalytics(data);
             } catch (err) {
                 console.error("Failed to load analytics", err);
-                setError("Failed to load dashboard data.");
             } finally {
                 setLoading(false);
             }

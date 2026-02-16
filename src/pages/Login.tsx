@@ -4,7 +4,6 @@ import { AuthContext, type User } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { AxiosError } from "axios";
 import {
-  LogIn,
   Mail,
   Lock,
   Loader2,
