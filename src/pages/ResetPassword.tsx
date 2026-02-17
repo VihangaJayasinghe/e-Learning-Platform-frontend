@@ -97,12 +97,12 @@ const ResetPassword: React.FC = () => {
   // Reusable Requirement UI
   const Requirement = ({ met, text }: { met: boolean; text: string }) => (
     <div
-      className={`flex items-center gap-1.5 text-[10px] font-bold transition-colors ${met ? "text-green-600" : "text-gray-400"}`}
+      className={`flex items-center gap-1.5 text-[10px] font-bold transition-colors ${met ? "text-teal-600" : "text-teal-900/30"}`}
     >
       {met ? (
         <Check size={12} strokeWidth={3} />
       ) : (
-        <div className="w-3 h-3 border-2 border-gray-200 rounded-full" />
+        <div className="w-3 h-3 border-2 border-teal-100 rounded-full" />
       )}
       {text}
     </div>
@@ -121,7 +121,7 @@ const ResetPassword: React.FC = () => {
           </p>
           <button
             onClick={() => navigate("/login")}
-            className="w-full bg-blue-600 text-white py-3 rounded-2xl font-black text-xs tracking-widest uppercase hover:bg-blue-700 transition-all"
+            className="w-full bg-teal-600 text-white py-3 rounded-2xl font-black text-xs tracking-widest uppercase hover:bg-teal-700 transition-all"
           >
             Back to Login
           </button>
@@ -131,23 +131,18 @@ const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center relative py-12 px-6 font-sans"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')`,
-      }}
-    >
-      <div className="absolute inset-0 bg-black/25"></div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-white via-teal-100 to-teal-600 relative py-12 px-6 font-sans">
+      {/* Background overlay removed */}
 
-      <div className="relative z-10 w-full max-w-[450px] bg-white/70 backdrop-blur-xl rounded-[40px] shadow-2xl p-10 border border-white/40">
+      <div className="relative z-10 w-full max-w-[450px] bg-white/95 backdrop-blur-xl rounded-[40px] shadow-2xl p-10 border border-white/40 shadow-teal-900/10">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/80 rounded-2xl flex items-center justify-center shadow-sm mb-4 mx-auto border border-gray-100">
-            <ShieldCheck className="text-blue-600" size={32} />
+          <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center shadow-sm mb-4 mx-auto border border-teal-100">
+            <ShieldCheck className="text-teal-600" size={32} />
           </div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-black text-teal-900 tracking-tight">
             Set New Password
           </h1>
-          <p className="text-gray-500 mt-1 font-medium text-sm">
+          <p className="text-teal-700 mt-1 font-medium text-sm">
             Please choose a strong password for your account.
           </p>
         </div>
@@ -165,12 +160,12 @@ const ResetPassword: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-400 ml-2 tracking-widest">
+            <label className="text-[10px] font-black uppercase text-teal-800 ml-2 tracking-widest">
               New Password
             </label>
             <div className="relative">
               <Lock
-                className="absolute left-4 top-3.5 text-gray-400"
+                className="absolute left-4 top-3.5 text-teal-500"
                 size={18}
               />
               <input
@@ -181,18 +176,18 @@ const ResetPassword: React.FC = () => {
                 onChange={(e) =>
                   setPasswords({ ...passwords, newPassword: e.target.value })
                 }
-                className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
+                className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-teal-100 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none transition-all font-medium text-teal-900 placeholder-teal-300"
               />
             </div>
           </div>
 
           <div className="space-y-1 relative">
-            <label className="text-[10px] font-black uppercase text-gray-400 ml-2 tracking-widest">
+            <label className="text-[10px] font-black uppercase text-teal-800 ml-2 tracking-widest">
               Confirm Password
             </label>
             <div className="relative">
               <Lock
-                className="absolute left-4 top-3.5 text-gray-400"
+                className="absolute left-4 top-3.5 text-teal-500"
                 size={18}
               />
               <input
@@ -206,7 +201,7 @@ const ResetPassword: React.FC = () => {
                     confirmPassword: e.target.value,
                   })
                 }
-                className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
+                className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-teal-100 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none transition-all font-medium text-teal-900 placeholder-teal-300"
               />
               {passwords.confirmPassword && (
                 <div
@@ -223,7 +218,7 @@ const ResetPassword: React.FC = () => {
           </div>
 
           {/* Live Requirement Grid */}
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-white/30 p-3 rounded-2xl border border-white/40">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-white/60 p-3 rounded-2xl border border-teal-100">
             <Requirement met={requirements.length} text="8+ Characters" />
             <Requirement met={requirements.uppercase} text="Uppercase Letter" />
             <Requirement met={requirements.number} text="Includes Number" />
@@ -232,7 +227,7 @@ const ResetPassword: React.FC = () => {
 
           <button
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-teal-200 transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="animate-spin" size={22} />
@@ -245,7 +240,7 @@ const ResetPassword: React.FC = () => {
         <div className="mt-8 text-center">
           <button
             onClick={() => navigate("/login")}
-            className="inline-flex items-center gap-2 text-sm font-black text-blue-600 hover:text-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-black text-teal-600 hover:text-teal-700 transition-colors"
           >
             <ArrowLeft size={16} /> BACK TO LOGIN
           </button>
