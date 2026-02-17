@@ -130,21 +130,34 @@ const VideoPlayerPage: React.FC = () => {
                             const qualityLevels = (this.player_ as any).qualityLevels();
                             const items = [];
 
+                            // Determine if "Auto" is selected (all levels enabled)
+                            let isAuto = true;
+                            for (let i = 0; i < qualityLevels.length; i++) {
+                                if (!qualityLevels[i].enabled) {
+                                    isAuto = false;
+                                    break;
+                                }
+                            }
+
                             // Auto Item
                             items.push(new QualityMenuItem(this.player_, {
                                 label: 'Auto',
                                 level: 'auto',
-                                selected: true // Default to auto
+                                selected: isAuto
                             }));
 
                             // Quality Items
                             for (let i = 0; i < qualityLevels.length; i++) {
                                 const level = qualityLevels[i];
                                 const label = level.height ? `${level.height}p` : `Level ${i}`;
+
+                                // Item is selected only if we are NOT in Auto mode AND this specific level is enabled
+                                const isSelected = !isAuto && level.enabled;
+
                                 items.push(new QualityMenuItem(this.player_, {
                                     label: label,
                                     level: i,
-                                    selected: false
+                                    selected: isSelected
                                 }));
                             }
 
