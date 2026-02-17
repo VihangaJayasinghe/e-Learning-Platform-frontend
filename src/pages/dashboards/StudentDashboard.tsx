@@ -8,6 +8,7 @@ import {
     Award
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import StudentDashboardTour from "../../components/tour/StudentDashboardTour";
 
 const StudentDashboard: React.FC = () => {
     const context = useContext(AuthContext);
@@ -21,7 +22,8 @@ const StudentDashboard: React.FC = () => {
 
     return (
         <>
-            <header className="mb-12">
+            <StudentDashboardTour />
+            <header className="mb-12 tour-welcome">
                 <div className="flex items-center gap-2 text-blue-600 font-bold text-sm uppercase tracking-widest mb-2">
                     <span className="w-8 h-[2px] bg-blue-600"></span>
                     Student Overview
@@ -35,7 +37,7 @@ const StudentDashboard: React.FC = () => {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 cursor-pointer">
+                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 cursor-pointer tour-learning">
                     <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors duration-500">
                         <GraduationCap
                             className="text-indigo-600 group-hover:text-white"
@@ -51,7 +53,7 @@ const StudentDashboard: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-100/50 transition-all duration-500 cursor-pointer">
+                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-100/50 transition-all duration-500 cursor-pointer tour-activity">
                     <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-teal-600 transition-colors duration-500">
                         <Clock className="text-teal-600 group-hover:text-white" size={28} />
                     </div>
@@ -76,7 +78,7 @@ const StudentDashboard: React.FC = () => {
                 </div>
 
                 {/* Common Card: Courses */}
-                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 cursor-pointer">
+                <div className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 cursor-pointer tour-catalog">
                     <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors duration-500">
                         <BookOpen
                             className="text-emerald-600 group-hover:text-white"
@@ -95,7 +97,7 @@ const StudentDashboard: React.FC = () => {
                 {/* Common Card: Profile Settings */}
                 <div
                     onClick={() => navigate("/profile")}
-                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-500 cursor-pointer"
+                    className="group bg-white p-8 rounded-3xl border border-gray-100 hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-500 cursor-pointer tour-profile"
                 >
                     <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-500">
                         <Settings

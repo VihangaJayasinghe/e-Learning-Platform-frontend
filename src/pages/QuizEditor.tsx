@@ -189,7 +189,7 @@ const QuizEditor: React.FC = () => {
 
     if (loading && !quiz) {
         return (
-            <div className="flex items-center justify-center min-h-screen text-purple-600">
+            <div className="flex items-center justify-center min-h-screen text-teal-600">
                 <Loader2 className="animate-spin" size={48} />
             </div>
         );
@@ -213,7 +213,7 @@ const QuizEditor: React.FC = () => {
                 <div className="mb-8">
                     <button
                         onClick={() => navigate(`/dashboard/classes/${quiz.classId}/months/${quiz.monthId}`)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors mb-4"
+                        className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors mb-4"
                     >
                         <ArrowLeft size={20} /> Back to Month
                     </button>
@@ -222,7 +222,7 @@ const QuizEditor: React.FC = () => {
                             <h1 className="text-3xl font-bold text-gray-900">{quiz.quizTitle}</h1>
                             <p className="text-gray-500 mt-2">{quiz.description}</p>
                         </div>
-                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-bold">
+                        <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-bold">
                             {quiz.questions?.length || 0} Questions
                         </span>
                     </div>
@@ -232,7 +232,7 @@ const QuizEditor: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('questions')}
                             className={`pb-3 px-2 font-bold text-sm transition-all ${activeTab === 'questions'
-                                ? 'text-purple-600 border-b-2 border-purple-600'
+                                ? 'text-teal-600 border-b-2 border-teal-600'
                                 : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
@@ -241,7 +241,7 @@ const QuizEditor: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('results')}
                             className={`pb-3 px-2 font-bold text-sm transition-all ${activeTab === 'results'
-                                ? 'text-purple-600 border-b-2 border-purple-600'
+                                ? 'text-teal-600 border-b-2 border-teal-600'
                                 : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
@@ -256,7 +256,7 @@ const QuizEditor: React.FC = () => {
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-8">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                    {isEditing ? <Edit2 size={20} className="text-blue-500" /> : <Plus size={20} className="text-purple-500" />}
+                                    {isEditing ? <Edit2 size={20} className="text-teal-500" /> : <Plus size={20} className="text-teal-500" />}
                                     {isEditing ? "Edit Question" : "Add New Question"}
                                 </h2>
 
@@ -272,7 +272,7 @@ const QuizEditor: React.FC = () => {
                                         <textarea
                                             value={questionText}
                                             onChange={(e) => setQuestionText(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-50 outline-none resize-none h-24"
+                                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-50 outline-none resize-none h-24"
                                             placeholder="Enter your question here..."
                                         />
                                     </div>
@@ -286,13 +286,13 @@ const QuizEditor: React.FC = () => {
                                                     name="correctAnswer"
                                                     checked={correctAnswerIndex === idx}
                                                     onChange={() => setCorrectAnswerIndex(idx)}
-                                                    className="w-4 h-4 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                                    className="w-4 h-4 text-teal-600 focus:ring-teal-500 cursor-pointer"
                                                 />
                                                 <input
                                                     type="text"
                                                     value={opt}
                                                     onChange={(e) => handleOptionChange(idx, e.target.value)}
-                                                    className={`flex-1 px-3 py-2 rounded-lg border ${correctAnswerIndex === idx ? 'border-purple-300 bg-purple-50' : 'border-gray-200'} focus:border-purple-500 outline-none text-sm`}
+                                                    className={`flex-1 px-3 py-2 rounded-lg border ${correctAnswerIndex === idx ? 'border-teal-300 bg-teal-50' : 'border-gray-200'} focus:border-teal-500 outline-none text-sm`}
                                                     placeholder={`Option ${idx + 1}`}
                                                 />
                                             </div>
@@ -313,7 +313,7 @@ const QuizEditor: React.FC = () => {
                                         <button
                                             type="submit"
                                             disabled={saving}
-                                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-purple-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                                            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-teal-200 disabled:opacity-50 flex items-center justify-center gap-2"
                                         >
                                             {saving ? <Loader2 className="animate-spin" size={16} /> : <><Save size={16} /> Save Question</>}
                                         </button>
@@ -333,11 +333,11 @@ const QuizEditor: React.FC = () => {
                                 quiz.questions.map((q, idx) => (
                                     <div
                                         key={q.questionId || q.id || idx}
-                                        className={`bg-white p-6 rounded-2xl border transition-all ${editingQuestionId === (q.questionId || q.id) ? 'border-purple-500 ring-2 ring-purple-50 shadow-md' : 'border-gray-100 shadow-sm hover:shadow-md'}`}
+                                        className={`bg-white p-6 rounded-2xl border transition-all ${editingQuestionId === (q.questionId || q.id) ? 'border-teal-500 ring-2 ring-teal-50 shadow-md' : 'border-gray-100 shadow-sm hover:shadow-md'}`}
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-3">
-                                                <span className="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm">
+                                                <span className="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center font-bold text-sm">
                                                     {idx + 1}
                                                 </span>
                                                 <h3 className="font-bold text-gray-900 mt-1">{q.questionText}</h3>
@@ -345,7 +345,7 @@ const QuizEditor: React.FC = () => {
                                             <div className="flex gap-1">
                                                 <button
                                                     onClick={() => handleEditClick(q)}
-                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-2 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                                                 >
                                                     <Edit2 size={18} />
                                                 </button>
@@ -379,7 +379,7 @@ const QuizEditor: React.FC = () => {
                     <div className="space-y-8">
                         {loadingResults ? (
                             <div className="flex justify-center py-12">
-                                <Loader2 className="animate-spin text-purple-600" size={32} />
+                                <Loader2 className="animate-spin text-teal-600" size={32} />
                             </div>
                         ) : !stats ? (
                             <p className="text-center text-gray-500 py-12">No results available yet.</p>
@@ -399,7 +399,7 @@ const QuizEditor: React.FC = () => {
                                             <BarChart3 size={20} />
                                             <span className="text-sm font-bold">Average Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-blue-600">{stats.averageScore ? stats.averageScore.toFixed(1) : 0}%</p>
+                                        <p className="text-3xl font-bold text-teal-600">{stats.averageScore ? stats.averageScore.toFixed(1) : 0}%</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-3 text-gray-500 mb-2">
@@ -427,7 +427,7 @@ const QuizEditor: React.FC = () => {
                                                     <span className="text-sm font-medium text-gray-600 w-24">{label}</span>
                                                     <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-purple-500 rounded-full"
+                                                            className="h-full bg-teal-500 rounded-full"
                                                             style={{ width: `${stats.totalAttempts > 0 ? (count / stats.totalAttempts) * 100 : 0}%` }}
                                                         />
                                                     </div>
@@ -471,7 +471,7 @@ const QuizEditor: React.FC = () => {
                                                                 <span className={`
                                                                     px-2 py-1 rounded-lg text-xs font-bold
                                                                     ${result.scorePercentage >= 75 ? 'bg-green-100 text-green-700' :
-                                                                        result.scorePercentage >= 50 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}
+                                                                        result.scorePercentage >= 50 ? 'bg-teal-100 text-teal-700' : 'bg-red-100 text-red-700'}
                                                                 `}>
                                                                     {result.scorePercentage?.toFixed(1)}%
                                                                 </span>

@@ -164,7 +164,7 @@ const StudentClassDetails: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px] text-purple-600">
+            <div className="flex items-center justify-center min-h-[400px] text-teal-600">
                 <Loader2 className="animate-spin" size={48} />
             </div>
         );
@@ -188,7 +188,7 @@ const StudentClassDetails: React.FC = () => {
         <div className="max-w-7xl mx-auto space-y-8 pb-12">
             <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors"
+                className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors"
             >
                 <ArrowLeft size={20} /> Back
             </button>
@@ -198,10 +198,10 @@ const StudentClassDetails: React.FC = () => {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Header Card */}
                     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-500 to-emerald-500"></div>
 
                         <div className="flex justify-between items-start mb-6">
-                            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 text-purple-700">
+                            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-700">
                                 {classData.status || "DRAFT"}
                             </span>
                             <div className="flex items-center gap-1 text-yellow-500 bg-yellow-50 px-3 py-1 rounded-full">
@@ -216,7 +216,7 @@ const StudentClassDetails: React.FC = () => {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-8 border-t border-gray-100">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                                <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
                                     <Clock size={24} />
                                 </div>
                                 <div>
@@ -225,7 +225,7 @@ const StudentClassDetails: React.FC = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                                <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
                                     <Calendar size={24} />
                                 </div>
                                 <div>
@@ -262,7 +262,7 @@ const StudentClassDetails: React.FC = () => {
                                     return (
                                         <div
                                             key={index}
-                                            className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${(isEnrolled && month.released) ? "bg-white hover:border-purple-200 cursor-pointer shadow-sm" : "bg-gray-50/50"
+                                            className={`border border-gray-100 rounded-xl p-5 flex justify-between items-center transition-all ${(isEnrolled && month.released) ? "bg-white hover:border-teal-200 cursor-pointer shadow-sm" : "bg-gray-50/50"
                                                 }`}
                                             onClick={() => {
                                                 if (isEnrolled && month.released) {
@@ -272,7 +272,7 @@ const StudentClassDetails: React.FC = () => {
                                             }}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={`h-12 w-12 rounded-xl border flex items-center justify-center font-bold shadow-sm transition-colors ${(isEnrolled && isPaid) ? "bg-purple-50 text-purple-600 border-purple-100" : "bg-white text-gray-400 border-gray-200"
+                                                <div className={`h-12 w-12 rounded-xl border flex items-center justify-center font-bold shadow-sm transition-colors ${(isEnrolled && isPaid) ? "bg-teal-50 text-teal-600 border-teal-100" : "bg-white text-gray-400 border-gray-200"
                                                     }`}>
                                                     {index + 1}
                                                 </div>
@@ -338,7 +338,7 @@ const StudentClassDetails: React.FC = () => {
                             {isEnrolled && (
                                 <button
                                     onClick={() => setShowReviewModal(true)}
-                                    className="bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-bold hover:bg-purple-100 transition-colors"
+                                    className="bg-teal-50 text-teal-600 px-4 py-2 rounded-xl font-bold hover:bg-teal-100 transition-colors"
                                 >
                                     Write a Review
                                 </button>
@@ -412,7 +412,7 @@ const StudentClassDetails: React.FC = () => {
                             <button
                                 onClick={handleEnroll}
                                 disabled={enrollLoading}
-                                className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-95 flex items-center justify-center gap-2"
+                                className="w-full bg-teal-600 text-white py-4 rounded-xl font-bold hover:bg-teal-700 transition-all shadow-lg shadow-teal-200 active:scale-95 flex items-center justify-center gap-2"
                             >
                                 {enrollLoading ? <Loader2 className="animate-spin" size={20} /> : "Enroll Now"}
                             </button>
@@ -487,7 +487,7 @@ const StudentClassDetails: React.FC = () => {
                                 <textarea
                                     value={reviewForm.comment}
                                     onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-50 outline-none resize-none h-32"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-50 outline-none resize-none h-32"
                                     placeholder="What did you think about this class?"
                                     required
                                 />
@@ -503,7 +503,7 @@ const StudentClassDetails: React.FC = () => {
                                 <button
                                     type="submit"
                                     disabled={reviewSubmitting}
-                                    className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200 disabled:opacity-70 flex items-center justify-center gap-2"
+                                    className="flex-1 bg-teal-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-teal-700 transition-colors shadow-lg shadow-teal-200 disabled:opacity-70 flex items-center justify-center gap-2"
                                 >
                                     {reviewSubmitting ? <Loader2 className="animate-spin" size={20} /> : "Submit Review"}
                                 </button>

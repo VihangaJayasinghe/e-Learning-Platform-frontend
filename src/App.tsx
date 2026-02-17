@@ -90,7 +90,6 @@ export default function App() {
             <Route path="teacher/:username" element={<StudentTeacherProfile />} />
             <Route path="quiz/:quizId" element={<QuizEditor />} />
             <Route path="quiz/attempt/:quizId" element={<StudentQuizAttempt />} />
-            <Route path="quiz/:quizId" element={<QuizEditor />} />
             <Route path="videos" element={<Videos />} />
             <Route path="payments" element={<Payments />} />
             <Route path="earnings" element={<TeacherPayments />} />
