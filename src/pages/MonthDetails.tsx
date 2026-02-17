@@ -61,6 +61,8 @@ const MonthDetails: React.FC = () => {
     const [quizzes, setQuizzes] = useState<QuizData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    // Modal States
     const [isAddVideoModalOpen, setIsAddVideoModalOpen] = useState(false);
     const [isDeleteVideoModalOpen, setIsDeleteVideoModalOpen] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
@@ -112,20 +114,18 @@ const MonthDetails: React.FC = () => {
         fetchData();
     }, [classId, yearMonth]);
 
+    // -- DELETE HANDLERS --
+
     const confirmDeleteVideo = async (deleteFromStorage: boolean) => {
         if (!classId || !yearMonth || !videoToDelete) return;
 
         try {
             setActionLoading(true);
-            // 1. Remove from month (always)
             await removeVideoFromMonth(classId, yearMonth, videoToDelete);
-
-            // 2. Delete from storage (if requested)
             if (deleteFromStorage) {
                 await deleteVideo(videoToDelete);
             }
-
-            fetchData(); // Refresh data
+            fetchData();
             setIsDeleteVideoModalOpen(false);
             setVideoToDelete(null);
         } catch (err: any) {
@@ -136,24 +136,15 @@ const MonthDetails: React.FC = () => {
         }
     };
 
-    const handleDeleteClick = (videoId: string) => {
-        setVideoToDelete(videoId);
-        setIsDeleteVideoModalOpen(true);
-    };
-
     const confirmDeleteDocument = async (deleteFromStorage: boolean) => {
         if (!classId || !yearMonth || !documentToDelete) return;
 
         try {
             setActionLoading(true);
-            // 1. Remove from month
             await removeDocumentFromMonth(classId, yearMonth, documentToDelete);
-
-            // 2. Delete from storage (if requested)
             if (deleteFromStorage) {
                 await deleteDocument(documentToDelete);
             }
-
             fetchData();
             setIsDeleteDocumentModalOpen(false);
             setDocumentToDelete(null);
@@ -163,11 +154,6 @@ const MonthDetails: React.FC = () => {
         } finally {
             setActionLoading(false);
         }
-    };
-
-    const handleDeleteDocumentClick = (documentId: string) => {
-        setDocumentToDelete(documentId);
-        setIsDeleteDocumentModalOpen(true);
     };
 
     const confirmDeleteQuiz = async () => {
@@ -187,26 +173,21 @@ const MonthDetails: React.FC = () => {
         }
     };
 
-    const handleDeleteQuizClick = (quizId: string) => {
-        setQuizToDelete(quizId);
-        setIsDeleteQuizModalOpen(true);
-    };
-
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen text-teal-600">
-                <Loader2 className="animate-spin" size={48} />
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <Loader2 className="animate-spin text-teal-600" size={48} />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-                <div className="text-red-600 text-lg font-medium">{error}</div>
+            <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-50">
+                <div className="text-red-600 text-lg font-bold">{error}</div>
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-bold"
                 >
                     <ArrowLeft size={20} /> Go Back
                 </button>
@@ -215,195 +196,236 @@ const MonthDetails: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <button
-                        onClick={() => navigate(`/dashboard/classes/${classId}`)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors mb-4"
-                    >
-                        <ArrowLeft size={20} /> Back to Class
-                    </button>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        Content for <span className="text-teal-600">{yearMonth}</span>
-                    </h1>
-                    <p className="text-gray-500 mt-2">Access all materials released for this month.</p>
+        <div className="min-h-screen bg-gray-50/50 p-6 md:p-10 font-sans text-gray-900">
+            {/* Back Button */}
+            <button
+                onClick={() => navigate(`/dashboard/classes/${classId}`)}
+                className="flex items-center gap-2 text-gray-500 hover:text-teal-600 font-bold mb-8 transition-colors group"
+            >
+                <div className="p-2 rounded-full bg-white border border-gray-200 group-hover:bg-teal-50 group-hover:border-teal-100 transition-colors">
+                    <ArrowLeft size={20} />
                 </div>
+                <span>Back to Class</span>
+            </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Header - Full Gradient with White Text */}
+            <div className="bg-gradient-to-r from-teal-600 to-teal-400 rounded-[32px] shadow-xl shadow-teal-900/10 overflow-hidden mb-12 p-8 md:p-12 relative">
+                {/* Decorative Background Patterns */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-800/20 rounded-full blur-2xl -ml-20 -mb-20 pointer-events-none"></div>
 
-                    {/* Videos Section */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-red-50 text-red-600 rounded-lg">
-                                    <Video size={24} />
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-900">Videos</h2>
-                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                                    {videos.length}
-                                </span>
-                            </div>
-                            <button
-                                onClick={() => setIsAddVideoModalOpen(true)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-bold"
-                            >
-                                <Plus size={16} /> Add
-                            </button>
-                        </div>
-
-                        {videos.length === 0 ? (
-                            <p className="text-gray-400 text-center py-8">No videos available.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {videos.map((video) => (
-                                    <div key={video.id} className="group border border-gray-100 rounded-xl p-4 hover:border-red-200 hover:shadow-sm transition-all relative">
-                                        <div className="flex justify-between items-start mb-2 pr-8">
-                                            <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-1">
-                                                {video.videoName}
-                                            </h3>
-                                            <PlayCircle size={20} className="text-gray-300 group-hover:text-red-500" />
-                                        </div>
-                                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{video.description}</p>
-                                        <button
-                                            onClick={() => {
-                                                console.log("Navigating to video:", video.id);
-                                                navigate(`/video/${video.id}`);
-                                            }}
-                                            className="text-xs font-bold text-red-600 hover:underline"
-                                        >
-                                            Watch Video
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteClick(video.id)}
-                                            className="absolute top-4 right-4 text-gray-300 hover:text-red-600 transition-colors"
-                                            title="Remove Video"
-                                            disabled={actionLoading}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start relative z-10">
+                    <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20 text-white">
+                        <FileText size={40} />
                     </div>
-
-                    {/* Documents Section */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                                    <FileText size={24} />
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-900">Documents</h2>
-                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                                    {documents.length}
-                                </span>
-                            </div>
-                            <button
-                                onClick={() => setIsAddDocumentModalOpen(true)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold"
-                            >
-                                <Plus size={16} /> Add
-                            </button>
-                        </div>
-
-                        {documents.length === 0 ? (
-                            <p className="text-gray-400 text-center py-8">No documents available.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {documents.map((doc) => (
-                                    <div key={doc.id} className="group flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all relative">
-                                        <div className="flex-1 pr-12">
-                                            <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                                                {doc.documentName}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 line-clamp-1">{doc.description}</p>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <a
-                                                href={`https://docs.google.com/viewer?url=${encodeURIComponent(doc.cloudinaryUrl)}&embedded=false`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg transition-colors text-sm font-medium"
-                                                title="View Document"
-                                            >
-                                                <Eye size={16} />
-                                                View
-                                            </a>
-                                        </div>
-                                        <button
-                                            onClick={() => handleDeleteDocumentClick(doc.id)}
-                                            className="absolute top-4 right-12 mr-2 text-gray-300 hover:text-red-600 transition-colors"
-                                            title="Remove Document"
-                                            disabled={actionLoading}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                    <div className="text-center md:text-left">
+                        <h1 className="text-4xl font-black text-white mb-3 tracking-tight">
+                            Month Content <span className="opacity-90">{yearMonth}</span>
+                        </h1>
+                        <p className="text-teal-50 text-lg max-w-2xl font-medium leading-relaxed">
+                            Manage and organize all learning materials for this month. Students will see exactly what you publish here.
+                        </p>
                     </div>
-
-                    {/* Quizzes Section */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
-                                    <HelpCircle size={24} />
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-900">Quizzes</h2>
-                                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">
-                                    {quizzes.length}
-                                </span>
-                            </div>
-                            <button
-                                onClick={() => setIsAddQuizModalOpen(true)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-bold"
-                            >
-                                <Plus size={16} /> Add
-                            </button>
-                        </div>
-
-                        {quizzes.length === 0 ? (
-                            <p className="text-gray-400 text-center py-8">No quizzes available.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {quizzes.map((quiz) => (
-                                    <div key={quiz.id} className="group flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:border-purple-200 hover:shadow-sm transition-all relative">
-                                        <div className="flex-1 pr-12">
-                                            <h3 className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-1">
-                                                {quiz.title}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 line-clamp-1">{quiz.description}</p>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                className="text-xs font-bold text-purple-600 hover:underline"
-                                                onClick={() => navigate(`/dashboard/quiz/${quiz.id}`)}
-                                            >
-                                                View
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteQuizClick(quiz.id)}
-                                                className="text-gray-300 hover:text-red-600 transition-colors"
-                                                title="Remove Quiz"
-                                                disabled={actionLoading}
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
                 </div>
             </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                {/* --- VIDEOS SECTION --- */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 relative overflow-hidden flex flex-col h-full">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
+                                <Video size={24} />
+                            </div>
+                            <h2 className="text-2xl font-black text-gray-900">Videos</h2>
+                            <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-black">
+                                {videos.length}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => setIsAddVideoModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-sm font-bold shadow-lg shadow-teal-200 hover:-translate-y-0.5"
+                        >
+                            <Plus size={18} /> Add New
+                        </button>
+                    </div>
+
+                    {videos.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center py-12 border-2 border-dashed border-gray-100 rounded-2xl">
+                            <Video className="text-gray-200 mb-3" size={48} />
+                            <p className="text-gray-400 font-bold">No videos yet</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {videos.map((video) => (
+                                <div
+                                    key={video.id}
+                                    onClick={() => navigate(`/video/${video.id}`)}
+                                    className="group flex items-start justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-white hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/5 transition-all relative cursor-pointer"
+                                >
+                                    <div className="flex items-start gap-4 flex-1 min-w-0">
+                                        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-teal-600 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                                            <PlayCircle size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-gray-900 group-hover:text-teal-700 transition-colors truncate pr-8">
+                                                {video.videoName}
+                                            </h3>
+                                            <p className="text-xs text-gray-500 line-clamp-2 mt-1 font-medium bg-white/50 p-1 rounded-md">
+                                                {video.description || "No description"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVideoToDelete(video.id);
+                                            setIsDeleteVideoModalOpen(true);
+                                        }}
+                                        className="text-gray-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg absolute top-3 right-3 z-10"
+                                        title="Delete Video"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* --- DOCUMENTS SECTION --- */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 relative overflow-hidden flex flex-col h-full">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
+                                <FileText size={24} />
+                            </div>
+                            <h2 className="text-2xl font-black text-gray-900">Docs</h2>
+                            <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-black">
+                                {documents.length}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => setIsAddDocumentModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-sm font-bold shadow-lg shadow-teal-200 hover:-translate-y-0.5"
+                        >
+                            <Plus size={18} /> Add New
+                        </button>
+                    </div>
+
+                    {documents.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center py-12 border-2 border-dashed border-gray-100 rounded-2xl">
+                            <FileText className="text-gray-200 mb-3" size={48} />
+                            <p className="text-gray-400 font-bold">No documents</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {documents.map((doc) => (
+                                <div
+                                    key={doc.id}
+                                    onClick={() => window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(doc.cloudinaryUrl)}&embedded=false`, '_blank')}
+                                    className="group flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-white hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/5 transition-all relative cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-teal-600 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                                            <FileText size={24} />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-gray-900 group-hover:text-teal-700 transition-colors truncate">
+                                                {doc.documentName}
+                                            </h3>
+                                            <p className="text-xs text-teal-600 mt-1 font-bold flex items-center gap-1">
+                                                <Eye size={12} /> Click to View
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDocumentToDelete(doc.id);
+                                            setIsDeleteDocumentModalOpen(true);
+                                        }}
+                                        className="text-gray-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg z-10"
+                                        title="Delete Document"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* --- QUIZZES SECTION --- */}
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 relative overflow-hidden flex flex-col h-full">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-teal-500"></div>
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
+                                <HelpCircle size={24} />
+                            </div>
+                            <h2 className="text-2xl font-black text-gray-900">Quizzes</h2>
+                            <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-black">
+                                {quizzes.length}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => setIsAddQuizModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-sm font-bold shadow-lg shadow-teal-200 hover:-translate-y-0.5"
+                        >
+                            <Plus size={18} /> Add New
+                        </button>
+                    </div>
+
+                    {quizzes.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center py-12 border-2 border-dashed border-gray-100 rounded-2xl">
+                            <HelpCircle className="text-gray-200 mb-3" size={48} />
+                            <p className="text-gray-400 font-bold">No quizzes</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {quizzes.map((quiz) => (
+                                <div
+                                    key={quiz.id}
+                                    onClick={() => navigate(`/dashboard/quiz/${quiz.id}`)}
+                                    className="group flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-white hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/5 transition-all relative cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-teal-600 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                                            <HelpCircle size={24} />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-gray-900 group-hover:text-teal-700 transition-colors truncate">
+                                                {quiz.title}
+                                            </h3>
+                                            <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                                                {quiz.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setQuizToDelete(quiz.id);
+                                            setIsDeleteQuizModalOpen(true);
+                                        }}
+                                        className="text-gray-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg z-10"
+                                        title="Delete Quiz"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+            </div>
+
+            {/* MODALS */}
             <VideoFormModal
                 isOpen={isAddVideoModalOpen}
                 onClose={() => setIsAddVideoModalOpen(false)}

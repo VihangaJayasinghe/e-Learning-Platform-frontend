@@ -6,8 +6,6 @@ import {
   User,
   Mail,
   Key,
-  ChevronDown,
-  ChevronUp,
   CheckCircle,
   AlertCircle,
   ArrowLeft,
@@ -54,7 +52,7 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [showPasswordForm, setShowPasswordForm] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [classes, setClasses] = useState<Class[]>([]);
   const [classesLoading, setClassesLoading] = useState(true);
@@ -178,7 +176,7 @@ const Profile: React.FC = () => {
         newPassword: "",
         confirmPassword: "",
       });
-      setTimeout(() => setShowPasswordForm(false), 2000);
+
     } catch (err) {
       const axiosError = err as AxiosError<any>;
       const backendMsg =
@@ -226,7 +224,7 @@ const Profile: React.FC = () => {
         <button
           onClick={() => {
             setIsEditing(!isEditing);
-            setShowPasswordForm(false);
+
             setStatus({ type: "", msg: "" });
           }}
           className="absolute top-6 right-6 z-20 bg-white/90 hover:bg-white backdrop-blur-md text-gray-700 hover:text-teal-600 px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 border border-gray-200 shadow-sm"
@@ -284,7 +282,7 @@ const Profile: React.FC = () => {
 
                 {user?.role === 'TEACHER' && (
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                    <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
                       <GraduationCap size={20} />
                     </div>
                     <div>
@@ -295,7 +293,7 @@ const Profile: React.FC = () => {
                 )}
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                  <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
                     <Star size={20} />
                   </div>
                   <div>

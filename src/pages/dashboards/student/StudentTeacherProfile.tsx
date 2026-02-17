@@ -135,7 +135,7 @@ const StudentTeacherProfile: React.FC = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
                                     <GraduationCap size={20} />
                                 </div>
                                 <div>

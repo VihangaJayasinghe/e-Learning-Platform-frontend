@@ -274,7 +274,7 @@ const ClassDetails: React.FC = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
-                                <div className="p-3 bg-blue-100 text-blue-700 rounded-xl">
+                                <div className="p-3 bg-teal-100 text-teal-700 rounded-xl">
                                     <Calendar size={24} strokeWidth={2.5} />
                                 </div>
                                 <div>
@@ -388,9 +388,7 @@ const ClassDetails: React.FC = () => {
                             </div>
                         </div>
 
-                        <button className="w-full bg-white border border-gray-200 text-gray-900 py-3 rounded-xl font-bold hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm">
-                            Contact Instructor
-                        </button>
+
                     </div>
                 </div>
             </div>
@@ -413,7 +411,7 @@ const ClassDetails: React.FC = () => {
                 isExtendModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
                         <div className="bg-white rounded-[32px] w-full max-w-sm shadow-2xl p-8 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-2 bg-indigo-500"></div>
+                            <div className="absolute top-0 left-0 w-full h-2 bg-teal-500"></div>
                             <h3 className="text-2xl font-black text-gray-900 mb-2">Extend Class</h3>
                             <p className="text-gray-500 mb-8 leading-relaxed">Add more months to the course content duration.</p>
 
@@ -428,7 +426,7 @@ const ClassDetails: React.FC = () => {
                                     >
                                         -
                                     </button>
-                                    <div className="flex-1 text-center font-black text-2xl text-indigo-600">
+                                    <div className="flex-1 text-center font-black text-2xl text-teal-600">
                                         {extendMonths}
                                     </div>
                                     <button
@@ -450,7 +448,7 @@ const ClassDetails: React.FC = () => {
                                 <button
                                     onClick={handleExtendDuration}
                                     disabled={actionLoading}
-                                    className="flex-1 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 flex items-center justify-center transition-colors shadow-lg shadow-indigo-200"
+                                    className="flex-1 px-4 py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 flex items-center justify-center transition-colors shadow-lg shadow-teal-200"
                                 >
                                     {actionLoading ? <Loader2 className="animate-spin" size={20} /> : "Extend"}
                                 </button>

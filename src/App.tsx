@@ -46,7 +46,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="p-10 text-center font-bold text-blue-600 animate-pulse">
+        <div className="p-10 text-center font-bold text-teal-600 animate-pulse">
           Loading...
         </div>
       </div>
