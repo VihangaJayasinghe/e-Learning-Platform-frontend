@@ -26,6 +26,14 @@ import TeacherPayments from "./pages/dashboards/teacher/TeacherPayments";
 import VideoPlayerPage from "./pages/VideoPlayerPage";
 
 import Videos from "./pages/Videos";
+import SystemAdmin from "./pages/SystemAdmin";
+import UserManagement from "./pages/UserManagement";
+import AllUsers from "./pages/AllUsers";
+import CourseCatalog from "./pages/CourseCatalog";
+import UpdateUser from "./pages/UpdateUser";
+import AdminCourses from "./pages/AdminCourses";
+import AdminClasses from "./pages/AdminClasses";
+import AdminClassDetails from "./pages/AdminClassDetails";
 
 // 1. Define Props for the PrivateRoute
 interface PrivateRouteProps {
@@ -93,7 +101,15 @@ export default function App() {
             <Route path="videos" element={<Videos />} />
             <Route path="payments" element={<Payments />} />
             <Route path="earnings" element={<TeacherPayments />} />
-          </Route>
+            <Route path="system-admin" element={<SystemAdmin />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="user-management/all-users" element={<AllUsers />} />
+            <Route path="course-catalog" element={<CourseCatalog />} />
+            <Route path="user-management/update-user/:username" element={<UpdateUser />} />
+            <Route path="admin-courses" element={<AdminCourses />} />
+            <Route path="admin-classes" element={<AdminClasses />} />
+            <Route path="admin-classes/:id" element={<AdminClassDetails />} />
+          </Route >
           <Route
             path="/profile"
             element={
@@ -113,8 +129,8 @@ export default function App() {
 
           {/* Fallback Catch-all */}
           <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+        </Routes >
+      </AuthProvider >
+    </BrowserRouter >
   );
 }

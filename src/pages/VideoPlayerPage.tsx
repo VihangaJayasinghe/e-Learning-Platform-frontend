@@ -108,7 +108,7 @@ const VideoPlayerPage: React.FC = () => {
                         }
 
                         handleClick() {
-                            const qualityLevels = (this.player_ as any).qualityLevels();
+                            const qualityLevels = ((this as any).player() as any).qualityLevels();
                             super.handleClick();
 
                             if (this.level === 'auto') {
@@ -127,7 +127,7 @@ const VideoPlayerPage: React.FC = () => {
 
                     class QualitySelector extends MenuButton {
                         createItems() {
-                            const qualityLevels = (this.player_ as any).qualityLevels();
+                            const qualityLevels = ((this as any).player() as any).qualityLevels();
                             const items = [];
 
                             // Determine if "Auto" is selected (all levels enabled)
@@ -140,7 +140,7 @@ const VideoPlayerPage: React.FC = () => {
                             }
 
                             // Auto Item
-                            items.push(new QualityMenuItem(this.player_, {
+                            items.push(new QualityMenuItem((this as any).player(), {
                                 label: 'Auto',
                                 level: 'auto',
                                 selected: isAuto
@@ -150,11 +150,7 @@ const VideoPlayerPage: React.FC = () => {
                             for (let i = 0; i < qualityLevels.length; i++) {
                                 const level = qualityLevels[i];
                                 const label = level.height ? `${level.height}p` : `Level ${i}`;
-
-                                // Item is selected only if we are NOT in Auto mode AND this specific level is enabled
-                                const isSelected = !isAuto && level.enabled;
-
-                                items.push(new QualityMenuItem(this.player_, {
+                                items.push(new QualityMenuItem((this as any).player(), {
                                     label: label,
                                     level: i,
                                     selected: isSelected

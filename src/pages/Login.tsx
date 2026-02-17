@@ -6,6 +6,14 @@ import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import AuthLayout from "../components/layouts/AuthLayout";
 import loginImage from "../src/images/loginpage.webp";
+import {
+  Mail,
+  Lock,
+  Loader2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -93,28 +101,122 @@ const Login: React.FC = () => {
           </div>
         )}
 
-        <button
-          disabled={loading}
-          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          {loading ? <Loader2 className="animate-spin" size={20} /> : "Sign in"}
-        </button>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-gray-400 ml-2 tracking-widest">
+              Username
+            </label>
+            <div className="relative">
+              <Mail
+                className="absolute left-4 top-3.5 text-gray-400"
+                size={18}
+              />
+              <input
+                name="username"
+                type="text"
+                placeholder="your_username"
+                required
+                value={formData.username}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
+              />
+            </div>
+          </div>
 
-        <button
-          type="button"
-          onClick={() => window.location.href = "http://localhost:9090/oauth2/authorization/google"}
-          className="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 hover:border-teal-200 transition-all flex items-center justify-center gap-2 mt-4"
-        >
-          <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-5 h-5" alt="Google" />
-          Sign in with Google
-        </button>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-gray-400 ml-2 tracking-widest">
+              Password
+            </label>
+            <div className="relative">
+              <Lock
+                className="absolute left-4 top-3.5 text-gray-400"
+                size={18}
+              />
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                required
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-12 py-3.5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-3.5 text-gray-400 hover:text-blue-600 transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
 
-        <p className="text-center text-sm font-medium text-gray-500 mt-8">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-teal-600 font-bold hover:underline">Sign up</Link>
-        </p>
-      </form>
-    </AuthLayout>
+          <div className="flex justify-between items-center px-1">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-600 font-bold group-hover:text-gray-900 transition-colors">
+                Remember me
+              </span>
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-sm font-black text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <button
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+          >
+            {loading ? (
+              <Loader2 className="animate-spin" size={22} />
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+
+        <div className="mt-8 text-center space-y-6">
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="flex-shrink mx-4 text-gray-400 text-[10px] font-black tracking-widest uppercase">
+              Social Login
+            </span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
+          <button
+            onClick={() =>
+            (window.location.href =
+              "http://localhost:9090/oauth2/authorization/google")
+            }
+            className="w-full bg-white/80 border border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl hover:bg-white hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm"
+          >
+            <img
+              src="https://www.svgrepo.com/show/355037/google.svg"
+              className="w-5 h-5"
+              alt="Google"
+            />
+            Continue with Google
+          </button>
+
+          <p className="text-gray-500 text-sm font-medium">
+            New to ELP?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-black hover:underline underline-offset-4"
+            >
+              Create account
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

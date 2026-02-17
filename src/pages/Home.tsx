@@ -2,7 +2,6 @@ import React, { useEffect, useContext, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import {
-  BookOpen,
   Users,
   Shield,
   ArrowRight,
@@ -32,13 +31,8 @@ const Home: React.FC = () => {
   }, [user, navigate]);
 
   return (
-    <div
-      className="min-h-screen w-full bg-cover bg-center relative font-sans overflow-x-hidden"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070')`,
-      }}
-    >
-      <div className="absolute inset-0 bg-black/35"></div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-white via-teal-100 to-teal-600 relative font-sans overflow-x-hidden">
+      {/* Background overlay removed */}
 
       {/* --- GLASS NAVBAR --- */}
       <nav className="relative z-20 flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
@@ -51,11 +45,11 @@ const Home: React.FC = () => {
           </span>
         </div>
 
-        <div className="hidden md:flex gap-10 text-white/70 font-black text-[10px] tracking-[0.3em] uppercase">
-          <a href="#features" className="hover:text-white transition-colors">
+        <div className="hidden md:flex gap-10 text-teal-900/90 font-black text-[10px] tracking-[0.3em] uppercase">
+          <a href="#features" className="hover:text-teal-600 hover:scale-105 transition-all">
             Features
           </a>
-          <a href="#about" className="hover:text-white transition-colors">
+          <a href="#about" className="hover:text-teal-600 hover:scale-105 transition-all">
             About
           </a>
           <a href="#support" className="hover:text-white transition-colors">
@@ -66,7 +60,7 @@ const Home: React.FC = () => {
         <div className="flex gap-4">
           <button
             onClick={() => navigate("/login")}
-            className="px-6 py-2.5 rounded-2xl text-white font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all border border-white/20 backdrop-blur-md"
+            className="px-6 py-2.5 rounded-2xl text-teal-900 font-bold text-xs uppercase tracking-widest hover:bg-teal-900/5 transition-all border border-teal-900/20 backdrop-blur-md"
           >
             LOG IN
           </button>
@@ -92,7 +86,7 @@ const Home: React.FC = () => {
             <br /> In Style.
           </h1>
 
-          <p className="text-xl text-white/70 max-w-lg leading-relaxed font-medium">
+          <p className="text-xl text-teal-800/70 max-w-lg leading-relaxed font-medium">
             A modern ecosystem designed for seamless collaboration between
             students and teachers. Secure, fast, and remarkably beautiful.
           </p>
@@ -141,9 +135,9 @@ const Home: React.FC = () => {
       {/* --- FOOTER --- */}
       <footer className="relative z-10 max-w-7xl mx-auto px-8 py-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex flex-col items-center md:items-start gap-2">
-          <span className="text-lg font-black text-white/90">ELP ACADEMY</span>
+          <span className="text-lg font-black text-white/90">EDURA ACADEMY</span>
           <p className="text-white/30 text-[10px] font-black tracking-[0.2em] uppercase">
-            © 2026 ELP SYSTEMS. ALL RIGHTS RESERVED.
+            © 2026 EDURA SYSTEMS. ALL RIGHTS RESERVED.
           </p>
         </div>
       </footer>
@@ -157,8 +151,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, desc }) => (
     <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 group-hover:bg-teal-600 transition-all duration-300">
       {icon}
     </div>
-    <h3 className="text-xl font-black text-white mb-2">{title}</h3>
-    <p className="text-white/50 text-sm leading-relaxed font-medium">{desc}</p>
+    <h3 className="text-xl font-black text-teal-900 mb-2">{title}</h3>
+    <p className="text-teal-800/80 text-sm leading-relaxed font-medium">{desc}</p>
   </div>
 );
 

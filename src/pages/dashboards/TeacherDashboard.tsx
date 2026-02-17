@@ -67,6 +67,14 @@ const TeacherDashboard: React.FC = () => {
         );
     }
 
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-[500px] text-red-600 font-bold">
+                <p>{error}</p>
+            </div>
+        );
+    }
+
     return (
         <div className="p-8 font-sans bg-white min-h-screen text-gray-900">
             <header className="mb-10 border-b border-gray-100 pb-8">

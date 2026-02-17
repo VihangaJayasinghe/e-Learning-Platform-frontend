@@ -406,14 +406,14 @@ const QuizEditor: React.FC = () => {
                                             <Award size={20} />
                                             <span className="text-sm font-bold">Highest Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-green-600">{stats.highestScore || 0}%</p>
+                                        <p className="text-3xl font-bold text-green-600">{stats.highestScore.toFixed(1) || 0}%</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                         <div className="flex items-center gap-3 text-gray-500 mb-2">
                                             <Clock size={20} />
                                             <span className="text-sm font-bold">Lowest Score</span>
                                         </div>
-                                        <p className="text-3xl font-bold text-red-500">{stats.lowestScore || 0}%</p>
+                                        <p className="text-3xl font-bold text-red-500">{stats.lowestScore.toFixed(1) || 0}%</p>
                                     </div>
                                 </div>
 
