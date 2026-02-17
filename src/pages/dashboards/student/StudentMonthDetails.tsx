@@ -126,7 +126,7 @@ const StudentMonthDetails: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[500px] text-purple-600">
+            <div className="flex items-center justify-center min-h-[500px] text-teal-600">
                 <Loader2 className="animate-spin" size={48} />
             </div>
         );
@@ -194,12 +194,12 @@ const StudentMonthDetails: React.FC = () => {
             <div>
                 <button
                     onClick={() => navigate(`/dashboard/browse/${classId}`)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors mb-4"
+                    className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors mb-4"
                 >
                     <ArrowLeft size={20} /> Back to Class
                 </button>
                 <h1 className="text-3xl font-black text-gray-900">
-                    Content for <span className="text-purple-600">{yearMonth}</span>
+                    Content for <span className="text-teal-600">{yearMonth}</span>
                 </h1>
                 <p className="text-gray-500 mt-2">Access your learning materials for this month.</p>
             </div>
@@ -209,7 +209,7 @@ const StudentMonthDetails: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('videos')}
                     className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'videos'
-                        ? "border-purple-600 text-purple-600"
+                        ? "border-teal-600 text-teal-600"
                         : "border-transparent text-gray-500 hover:text-gray-900"
                         }`}
                 >
@@ -218,7 +218,7 @@ const StudentMonthDetails: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('documents')}
                     className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'documents'
-                        ? "border-purple-600 text-purple-600"
+                        ? "border-teal-600 text-teal-600"
                         : "border-transparent text-gray-500 hover:text-gray-900"
                         }`}
                 >
@@ -227,7 +227,7 @@ const StudentMonthDetails: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('quizzes')}
                     className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'quizzes'
-                        ? "border-purple-600 text-purple-600"
+                        ? "border-teal-600 text-teal-600"
                         : "border-transparent text-gray-500 hover:text-gray-900"
                         }`}
                 >
@@ -240,16 +240,16 @@ const StudentMonthDetails: React.FC = () => {
                 {activeTab === 'videos' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {videos.map((video) => (
-                            <div key={video.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-purple-100/50 transition-all duration-300">
+                            <div key={video.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-teal-100/50 transition-all duration-300">
                                 <div className="aspect-video bg-gray-100 relative items-center justify-center flex">
-                                    <PlayCircle size={48} className="text-gray-300 group-hover:text-purple-600 transition-colors" />
+                                    <PlayCircle size={48} className="text-gray-300 group-hover:text-teal-600 transition-colors" />
                                 </div>
                                 <div className="p-6">
                                     <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{video.videoName}</h3>
                                     <p className="text-sm text-gray-500 line-clamp-2 mb-4">{video.description}</p>
                                     <button
                                         onClick={() => navigate(`/video/${video.id}`)}
-                                        className="inline-flex items-center gap-2 text-purple-600 font-bold text-sm hover:underline"
+                                        className="inline-flex items-center gap-2 text-teal-600 font-bold text-sm hover:underline"
                                     >
                                         <PlayCircle size={16} /> Watch Now
                                     </button>
@@ -267,8 +267,8 @@ const StudentMonthDetails: React.FC = () => {
                 {activeTab === 'documents' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {documents.map((doc) => (
-                            <div key={doc.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:shadow-blue-50 transition-all flex items-start gap-4">
-                                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <div key={doc.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:shadow-teal-50 transition-all flex items-start gap-4">
+                                <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
                                     <FileText size={24} />
                                 </div>
                                 <div className="flex-1">
@@ -299,8 +299,8 @@ const StudentMonthDetails: React.FC = () => {
                 {activeTab === 'quizzes' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {quizzes.map((quiz) => (
-                            <div key={quiz.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:shadow-purple-50 transition-all flex items-start gap-4">
-                                <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                            <div key={quiz.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:shadow-teal-50 transition-all flex items-start gap-4">
+                                <div className="p-3 bg-teal-50 text-teal-600 rounded-xl">
                                     <HelpCircle size={24} />
                                 </div>
                                 <div className="flex-1">
@@ -308,7 +308,7 @@ const StudentMonthDetails: React.FC = () => {
                                     <p className="text-sm text-gray-500 mb-4">{quiz.description}</p>
                                     <button
                                         onClick={() => navigate(`/dashboard/quiz/attempt/${quiz.id}`)}
-                                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-purple-200"
+                                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-teal-200"
                                     >
                                         Attempt Quiz
                                     </button>

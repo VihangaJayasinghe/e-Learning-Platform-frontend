@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-// import "videojs-hls-quality-selector"; // We are using a custom implementation
 import "videojs-contrib-quality-levels";
 import { getVideoById } from "../services/api";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
+import { AuthContext } from "../context/AuthContext";
 
 interface VideoData {
     id: string;
@@ -19,12 +19,25 @@ interface VideoData {
 const VideoPlayerPage: React.FC = () => {
     const { videoId } = useParams<{ videoId: string }>();
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext) || {};
     const videoNode = useRef<HTMLDivElement>(null);
     const playerRef = useRef<any | null>(null);
 
     const [video, setVideo] = useState<VideoData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [watermarkPos, setWatermarkPos] = useState({ top: 10, left: 10 });
+
+    useEffect(() => {
+        // Randomize watermark position every 5 seconds
+        const interval = setInterval(() => {
+            const randomTop = Math.floor(Math.random() * 80) + 10;
+            const randomLeft = Math.floor(Math.random() * 80) + 10;
+            setWatermarkPos({ top: randomTop, left: randomLeft });
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const fetchVideo = async () => {
@@ -117,11 +130,20 @@ const VideoPlayerPage: React.FC = () => {
                             const qualityLevels = ((this as any).player() as any).qualityLevels();
                             const items = [];
 
+                            // Determine if "Auto" is selected (all levels enabled)
+                            let isAuto = true;
+                            for (let i = 0; i < qualityLevels.length; i++) {
+                                if (!qualityLevels[i].enabled) {
+                                    isAuto = false;
+                                    break;
+                                }
+                            }
+
                             // Auto Item
                             items.push(new QualityMenuItem((this as any).player(), {
                                 label: 'Auto',
                                 level: 'auto',
-                                selected: true // Default to auto
+                                selected: isAuto
                             }));
 
                             // Quality Items
@@ -131,7 +153,7 @@ const VideoPlayerPage: React.FC = () => {
                                 items.push(new QualityMenuItem((this as any).player(), {
                                     label: label,
                                     level: i,
-                                    selected: false
+                                    selected: isSelected
                                 }));
                             }
 
@@ -307,25 +329,76 @@ const VideoPlayerPage: React.FC = () => {
                     background-color: rgba(43, 51, 63, 0.9); /* Match videojs theme */
                     max-height: 15em;
                 }
+                /* Customize Video.js Play Button */
+                .video-js .vjs-big-play-button {
+                    background-color: rgba(13, 148, 136, 0.8) !important; /* Teal-600 */
+                    border-color: transparent !important;
+                    border-radius: 50% !important;
+                    width: 2em !important;
+                    height: 2em !important;
+                    line-height: 2em !important;
+                    margin-left: -1em !important;
+                    margin-top: -1em !important;
+                    transition: all 0.3s ease;
+                }
+                .video-js:hover .vjs-big-play-button {
+                    background-color: rgba(13, 148, 136, 1) !important;
+                    transform: scale(1.1);
+                }
+                .video-js .vjs-control-bar {
+                    background-color: rgba(0, 0, 0, 0.7) !important;
+                    border-top-left-radius: 12px;
+                    border-top-right-radius: 12px;
+                    margin-bottom: 10px;
+                    width: 96%;
+                    left: 2%;
+                }
             `}</style>
-            <div className="flex flex-col h-full bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 p-6">
-                <div className="w-full max-w-5xl mx-auto">
+            <div className="flex flex-col h-full bg-white text-gray-900 p-8 min-h-screen">
+                <div className="w-full max-w-6xl mx-auto">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors mb-6"
+                        className="flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors mb-8 font-medium group"
                     >
-                        <ArrowLeft size={20} /> Back to Dashboard
+                        <div className="p-2 rounded-full bg-gray-100 group-hover:bg-teal-50 transition-colors">
+                            <ArrowLeft size={20} />
+                        </div>
+                        Back to Library
                     </button>
 
-                    <div className="bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
-                        <div data-vjs-player>
+                    <div className="bg-black rounded-[24px] overflow-hidden shadow-2xl shadow-teal-900/20 border border-gray-200 relative group">
+                        <div data-vjs-player className="relative">
                             <div ref={videoNode} />
+
+                            {/* Security Watermark */}
+                            {user?.username && (
+                                <div
+                                    className="absolute text-white/30 text-lg font-bold pointer-events-none select-none z-50 transition-all duration-1000 ease-in-out"
+                                    style={{
+                                        top: `${watermarkPos.top}%`,
+                                        left: `${watermarkPos.left}%`,
+                                        textShadow: '0 0 4px rgba(0,0,0,0.5)'
+                                    }}
+                                >
+                                    {user.username}
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h1 className="text-3xl font-bold mb-3">{video.videoName}</h1>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{video.description}</p>
+                    <div className="mt-8">
+                        <div className="max-w-4xl">
+                            <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight leading-tight">{video.videoName}</h1>
+                            <div className="flex items-center gap-4 mb-6">
+                                <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    Video
+                                </span>
+                                {/* Add more metadata tags here if available, e.g., duration, date */}
+                            </div>
+                            <div className="prose prose-lg text-gray-600">
+                                <p className="leading-relaxed">{video.description}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

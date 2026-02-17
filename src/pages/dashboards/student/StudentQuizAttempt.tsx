@@ -169,7 +169,7 @@ const StudentQuizAttempt: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen text-purple-600">
+            <div className="flex items-center justify-center min-h-screen text-teal-600">
                 <Loader2 className="animate-spin" size={48} />
             </div>
         );
@@ -249,24 +249,24 @@ const StudentQuizAttempt: React.FC = () => {
             <div className="max-w-3xl mx-auto p-6 pt-12">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors mb-8"
+                    className="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors mb-8"
                 >
                     <ArrowLeft size={20} /> Cancel
                 </button>
 
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-10 text-white">
+                    <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-10 text-white">
                         <h1 className="text-3xl font-black mb-4">{quiz?.title}</h1>
-                        <p className="text-purple-100 text-lg leading-relaxed opacity-90">{quiz?.description}</p>
+                        <p className="text-teal-100 text-lg leading-relaxed opacity-90">{quiz?.description}</p>
                     </div>
 
                     <div className="p-10">
                         <div className="flex items-center gap-6 mb-10">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg font-bold text-sm">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg font-bold text-sm">
                                 <HelpCircle size={18} />
                                 {quiz?.questions?.length || 0} Questions
                             </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-bold text-sm">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg font-bold text-sm">
                                 <Clock size={18} />
                                 ~{(quiz?.questions?.length || 0) * 2} Minutes
                             </div>
@@ -286,7 +286,7 @@ const StudentQuizAttempt: React.FC = () => {
                         <button
                             onClick={handleStartQuiz}
                             disabled={isSubmitting}
-                            className="w-full py-5 bg-purple-600 text-white rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl shadow-purple-200 active:scale-95 flex items-center justify-center gap-3"
+                            className="w-full py-5 bg-teal-600 text-white rounded-2xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl shadow-teal-200 active:scale-95 flex items-center justify-center gap-3"
                         >
                             {isSubmitting ? <Loader2 className="animate-spin" /> : <Play size={24} fill="currentColor" />}
                             Start Quiz
@@ -310,7 +310,7 @@ const StudentQuizAttempt: React.FC = () => {
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-purple-600 transition-all duration-500 ease-out"
+                        className="h-full bg-teal-600 transition-all duration-500 ease-out"
                         style={{ width: `${calculateProgress()}%` }}
                     />
                 </div>
@@ -328,21 +328,21 @@ const StudentQuizAttempt: React.FC = () => {
                                 key={index}
                                 onClick={() => setSelectedAnswer(index)}
                                 className={`w-full p-5 rounded-xl text-left font-medium transition-all flex justify-between items-center group ${selectedAnswer === index
-                                    ? "bg-purple-50 border-2 border-purple-500 text-purple-900 shadow-md"
-                                    : "bg-white border-2 border-gray-100 text-gray-600 hover:border-purple-200 hover:bg-gray-50"
+                                    ? "bg-teal-50 border-2 border-teal-500 text-teal-900 shadow-md"
+                                    : "bg-white border-2 border-gray-100 text-gray-600 hover:border-teal-200 hover:bg-gray-50"
                                     }`}
                             >
                                 <span className="flex items-center gap-4">
                                     <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors ${selectedAnswer === index
-                                        ? "bg-purple-500 border-purple-500 text-white"
-                                        : "bg-gray-100 border-gray-200 text-gray-400 group-hover:border-purple-300 group-hover:text-purple-500"
+                                        ? "bg-teal-500 border-teal-500 text-white"
+                                        : "bg-gray-100 border-gray-200 text-gray-400 group-hover:border-teal-300 group-hover:text-teal-500"
                                         }`}>
                                         {String.fromCharCode(65 + index)}
                                     </span>
                                     {option}
                                 </span>
                                 {selectedAnswer === index && (
-                                    <CheckCircle className="text-purple-600" size={24} />
+                                    <CheckCircle className="text-teal-600" size={24} />
                                 )}
                             </button>
                         ))}
@@ -353,7 +353,7 @@ const StudentQuizAttempt: React.FC = () => {
                     <button
                         onClick={handleAnswerSubmit}
                         disabled={selectedAnswer === null || isSubmitting}
-                        className="py-3 px-8 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 disabled:opacity-50 disabled:shadow-none active:scale-95 flex items-center gap-2"
+                        className="py-3 px-8 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-all shadow-lg shadow-teal-200 disabled:opacity-50 disabled:shadow-none active:scale-95 flex items-center gap-2"
                     >
                         {isSubmitting ? (
                             <Loader2 className="animate-spin" size={20} />

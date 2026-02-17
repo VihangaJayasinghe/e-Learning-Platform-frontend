@@ -15,7 +15,10 @@
     "lucide-react": "^0.564.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-is": "^19.2.4",
+    "react-joyride": "^2.9.3",
     "react-router-dom": "^7.13.0",
+    "recharts": "^3.7.0",
     "video.js": "^8.23.7",
     "videojs-contrib-quality-levels": "^4.1.0",
     "videojs-hls-quality-selector": "^2.0.0"

@@ -60,7 +60,7 @@ const StudentPayments: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px] text-purple-600">
+            <div className="flex items-center justify-center min-h-[400px] text-teal-600">
                 <Loader2 className="animate-spin" size={48} />
             </div>
         );
@@ -69,7 +69,7 @@ const StudentPayments: React.FC = () => {
     return (
         <div className="p-8 max-w-7xl mx-auto">
             <h1 className="text-3xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                <div className="p-3 bg-purple-100 rounded-xl text-purple-600">
+                <div className="p-3 bg-teal-100 rounded-xl text-teal-600">
                     <DollarSign size={32} />
                 </div>
                 My Payment History
@@ -116,7 +116,7 @@ const StudentPayments: React.FC = () => {
                                     <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="p-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold group-hover:bg-blue-100 transition-colors">
+                                                <div className="w-10 h-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center font-bold group-hover:bg-teal-100 transition-colors">
                                                     <BookOpen size={20} />
                                                 </div>
                                                 <span className="font-bold text-gray-900">{payment.className || "Unknown Class"}</span>
@@ -142,7 +142,7 @@ const StudentPayments: React.FC = () => {
                                         </td>
                                         <td className="p-5 text-center">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${payment.status === 'COMPLETED'
-                                                ? 'bg-green-100 text-green-700'
+                                                ? 'bg-teal-100 text-teal-700'
                                                 : 'bg-yellow-100 text-yellow-700'
                                                 }`}>
                                                 {payment.status === 'COMPLETED' ? <CheckCircle size={12} /> : <Clock size={12} />}

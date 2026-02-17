@@ -61,7 +61,7 @@ const QuizFormModal: React.FC<QuizFormModalProps> = ({
             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl transform transition-all">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <span className="p-2 bg-purple-100 text-purple-600 rounded-lg">
+                        <span className="p-2 bg-teal-100 text-teal-600 rounded-lg">
                             <HelpCircle size={24} />
                         </span>
                         Create New Quiz
@@ -85,7 +85,7 @@ const QuizFormModal: React.FC<QuizFormModalProps> = ({
                             required
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-50 transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-50 transition-all outline-none font-medium"
                             placeholder="e.g. Week 1 Assessment"
                         />
                     </div>
@@ -96,7 +96,7 @@ const QuizFormModal: React.FC<QuizFormModalProps> = ({
                             required
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-50 transition-all outline-none font-medium resize-none h-24"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-50 transition-all outline-none font-medium resize-none h-24"
                             placeholder="Briefly describe what this quiz checks..."
                         />
                     </div>
@@ -112,7 +112,7 @@ const QuizFormModal: React.FC<QuizFormModalProps> = ({
                         <button
                             type="submit"
                             disabled={loading || !title.trim() || !description.trim()}
-                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Quiz"}
                         </button>

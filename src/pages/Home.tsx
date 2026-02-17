@@ -37,11 +37,11 @@ const Home: React.FC = () => {
       {/* --- GLASS NAVBAR --- */}
       <nav className="relative z-20 flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="bg-transparent p-0 rounded-xl">
-            <img src="/src/assets/logo.png" alt="Edura Logo" className="h-12 w-auto object-contain" />
+          <div className="bg-teal-600 p-2 rounded-xl shadow-lg shadow-teal-500/20">
+            <BookOpen className="text-white" size={24} />
           </div>
-          <span className="text-2xl font-black text-teal-900 tracking-tighter uppercase ml-2">
-            Edura<span className="text-teal-600">.</span>
+          <span className="text-2xl font-black text-white tracking-tighter uppercase">
+            ELP<span className="text-teal-400">.</span>
           </span>
         </div>
 
@@ -66,7 +66,7 @@ const Home: React.FC = () => {
           </button>
           <button
             onClick={() => navigate("/register")}
-            className="px-6 py-2.5 rounded-2xl bg-teal-600 text-white font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-xl shadow-teal-600/20"
+            className="px-6 py-2.5 rounded-2xl bg-teal-600 text-white font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-xl shadow-teal-500/40"
           >
             GET STARTED
           </button>
@@ -76,13 +76,13 @@ const Home: React.FC = () => {
       {/* --- HERO SECTION --- */}
       <main className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32 text-center md:text-left flex flex-col md:flex-row items-center gap-16">
         <div className="md:w-1/2 space-y-10 animate-in fade-in slide-in-from-left duration-1000">
-          <div className="inline-flex items-center gap-2 px-5 py-2 bg-teal-900/5 backdrop-blur-md border border-teal-900/10 rounded-full text-teal-700 text-[10px] font-black uppercase tracking-[0.25em]">
-            <Star size={14} className="fill-teal-600 text-teal-600" />
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-teal-300 text-[10px] font-black uppercase tracking-[0.25em]">
+            <Star size={14} className="text-teal-400 text-teal-400" />
             Empowering Future Leaders
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black text-teal-900 leading-[0.9] tracking-tighter">
-            Master Your <br /> <span className="text-teal-600">Education</span>{" "}
+          <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter">
+            Master Your <br /> <span className="text-teal-400">Education</span>{" "}
             <br /> In Style.
           </h1>
 
@@ -94,7 +94,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <button
               onClick={() => navigate("/register")}
-              className="group px-10 py-5 bg-teal-900 text-white font-black rounded-[24px] hover:bg-teal-800 transition-all flex items-center justify-center gap-3 shadow-2xl shadow-teal-900/20 active:scale-95"
+              className="group px-10 py-5 bg-white text-teal-900 font-black rounded-[24px] hover:bg-teal-50 transition-all flex items-center justify-center gap-3 shadow-2xl active:scale-95"
             >
               JOIN THE ACADEMY{" "}
               <ArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -115,16 +115,16 @@ const Home: React.FC = () => {
             title="Certified"
             desc="Earn recognized credentials for your course completions."
           />
-          <div className="p-8 bg-white/95 backdrop-blur-sm rounded-[40px] shadow-2xl text-teal-900 space-y-5 border border-white/50">
+          <div className="p-8 bg-teal-600 rounded-[40px] shadow-2xl text-white space-y-5 border border-teal-400/30">
             <h4 className="text-2xl font-black leading-tight">
               Ready to excel?
             </h4>
-            <p className="text-teal-700 text-xs font-bold leading-relaxed opacity-80 uppercase tracking-wider">
+            <p className="text-teal-100 text-xs font-bold leading-relaxed opacity-80 uppercase tracking-wider">
               Join thousands of students and teachers today.
             </p>
             <button
               onClick={() => navigate("/register")}
-              className="w-full py-4 bg-teal-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/20"
+              className="w-full py-4 bg-white text-teal-600 font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-teal-50 transition-colors shadow-lg"
             >
               Sign Up Now
             </button>
@@ -147,8 +147,8 @@ const Home: React.FC = () => {
 
 // Typed Helper Component
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, desc }) => (
-  <div className="p-10 bg-white/80 backdrop-blur-xl border border-white/60 rounded-[40px] hover:bg-white/90 transition-all group cursor-default shadow-lg shadow-teal-900/10">
-    <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6 text-teal-600 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300 shadow-sm">
+  <div className="p-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-[40px] hover:bg-white/15 transition-all group cursor-default">
+    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 group-hover:bg-teal-600 transition-all duration-300">
       {icon}
     </div>
     <h3 className="text-xl font-black text-teal-900 mb-2">{title}</h3>
