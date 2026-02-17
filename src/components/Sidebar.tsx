@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
 
                 <button
                     onClick={item.action}
-                    className={`p-3 transition-colors duration-200 relative
+                    className={`p-3 transition-colors duration-200 relative tour-sidebar-${item.label.toLowerCase()}
             ${isActive ? "text-teal-500" : "text-gray-400 hover:text-gray-100"}
           `}
                 >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import Joyride, { STATUS, type CallBackProps, type Step } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 
 const StudentDashboardTour: React.FC = () => {
@@ -31,35 +31,38 @@ const StudentDashboardTour: React.FC = () => {
 
     const steps: Step[] = [
         {
-            target: '.tour-welcome',
+            target: 'body',
             placement: 'center',
             content: (
                 <div className="text-center p-2">
-                    <h2 className="text-xl font-bold text-teal-600 mb-2">Welcome to Your Dashboard!</h2>
+                    <h2 className="text-xl font-bold text-teal-600 mb-2">Welcome to your Dashboard!</h2>
                     <p className="text-gray-600">
-                        This is your central hub for learning. Let's take a quick look around.
+                        We're glad to have you here. Use the sidebar to navigate through your customized learning experience.
                     </p>
                 </div>
             ),
             disableBeacon: true,
         },
         {
-            target: '.tour-learning',
-            content: 'Access all your enrolled courses, certificates, and continue your lessons from here.',
+            target: '.tour-sidebar-classes',
+            content: 'View your enrolled classes and continue your learning journey.',
+            placement: 'right'
         },
         {
-            target: '.tour-activity',
-            content: 'Quickly jump back into your most recent activity.',
+            target: '.tour-sidebar-browse',
+            content: 'Browse our catalog to find new courses and expand your skills.',
+            placement: 'right'
         },
         {
-            target: '.tour-catalog',
-            content: 'Explore our course catalog to find new topics and expand your skills.',
+            target: '.tour-sidebar-payments',
+            content: 'Track your payment history and manage your subscriptions.',
+            placement: 'right'
         },
         {
-            target: '.tour-profile',
-            content: 'Manage your account settings, password, and security here.',
-        },
-        // Add more steps as needed based on actual dashboard content
+            target: '.tour-sidebar-profile',
+            content: 'Update your personal details and account settings.',
+            placement: 'right'
+        }
     ];
 
     return (
